@@ -63,6 +63,13 @@ enum custom_keycodes {
 #define PT_Z    LT(LAYER_POINTER, FR_Z)
 #define PT_COLN LT(LAYER_POINTER, FR_COLN)
 
+// Combos
+// Y + ' -> !
+const uint16_t PROGMEM combo_exlm[] = {FR_Y, MC_SQTDQ, COMBO_END};
+combo_t key_combos[] = {
+    COMBO(combo_exlm, FR_EXLM),
+};
+
 #ifndef POINTING_DEVICE_ENABLE
 #    define DRGSCRL KC_NO
 #    define DPI_MOD KC_NO

@@ -37,3 +37,6 @@
 
 // Invert scroll direction (natural scrolling)
 #define DILEMMA_DRAGSCROLL_REVERSE_Y
+
+// Combo settings (matching ZMK COMBO_TERM)
+#define COMBO_TERM 50
