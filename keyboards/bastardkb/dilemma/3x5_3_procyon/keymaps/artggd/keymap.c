@@ -47,6 +47,7 @@ enum custom_keycodes {
     MC_BRACK,               // Types [] and moves cursor inside
     MC_CURLY,               // Types {} and moves cursor inside
     MC_BTICK,               // Types `` and moves cursor inside
+    MC_SQTDQ,               // ' normally, " when shifted (mod morph)
 };
 
 // Automatically enable sniping-mode on the pointer layer.
@@ -86,7 +87,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    * ZMK thumb layout: ESC/Media, Space/Nav, Tab/Shift | Enter/Fun, Backspace/Sym, Shift/Num
    */
   [LAYER_BASE] = LAYOUT_split_3x5_3(
-       FR_Q,         FR_W,         FR_F,         FR_P,         FR_G,        FR_J,    FR_L,         FR_O,         FR_Y,         FR_QUOT,
+       FR_Q,         FR_W,         FR_F,         FR_P,         FR_G,        FR_J,    FR_L,         FR_O,         FR_Y,         MC_SQTDQ,
        LCTL_T(FR_A), LALT_T(FR_R), LGUI_T(FR_S), LSFT_T(FR_T), FR_D,        FR_H,    RSFT_T(FR_N), RGUI_T(FR_E), LALT_T(FR_I), RCTL_T(FR_U),
        PT_Z,         RALT_T(FR_X), FR_C,         FR_V,         FR_B,        FR_K,    FR_M,         FR_COMM,      FR_SCLN,      PT_COLN,
                                    ESC_MED,      SPC_NAV,      TAB_SFT,     ENT_FUN, BSP_SYM,      SFT_NUM
@@ -226,6 +227,21 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 tap_code(KC_NUHS);
                 tap_code(KC_NUHS);
                 tap_code(KC_LEFT);
+            }
+            return false;
+        case MC_SQTDQ:
+            // Mod morph: ' normally, " when shift is held
+            if (record->event.pressed) {
+                uint8_t mods = get_mods() | get_oneshot_mods();
+                if (mods & MOD_MASK_SHIFT) {
+                    // Clear shift, send ", restore shift
+                    del_mods(MOD_MASK_SHIFT);
+                    del_oneshot_mods(MOD_MASK_SHIFT);
+                    tap_code16(FR_DQUO);
+                    set_mods(mods);
+                } else {
+                    tap_code(FR_QUOT);
+                }
             }
             return false;
     }
