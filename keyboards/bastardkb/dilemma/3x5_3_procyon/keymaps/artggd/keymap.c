@@ -84,7 +84,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    * Right: Arrows, Home/End, PgUp/PgDn
    */
   [LAYER_NAV] = LAYOUT_split_3x5_3(
-    G(KC_Z),  G(KC_X), G(KC_C), G(KC_V), G(S(KC_Z)),   XXXXXXX, KC_HOME, KC_UP,   KC_END,  XXXXXXX,
+    G(KC_Z),  G(KC_X), G(KC_C), G(KC_V), G(S(KC_Z)),   XXXXXXX, G(KC_LEFT), KC_UP, G(KC_RGHT), XXXXXXX,
     KC_LCTL,  KC_LALT, KC_LGUI, KC_LSFT, G(KC_D),      KC_CAPS, KC_LEFT, KC_DOWN, KC_RGHT, KC_PGUP,
     XXXXXXX,  KC_RALT, XXXXXXX, XXXXXXX, XXXXXXX,      XXXXXXX, XXXXXXX, KC_APP,  XXXXXXX, KC_PGDN,
                        XXXXXXX, _______, XXXXXXX,      _______, _______, _______
