@@ -37,8 +37,8 @@ enum dilemma_keymap_layers {
 #define TAB_FUN LT(LAYER_FUNCTION, KC_TAB)
 #define ENT_SYM LT(LAYER_SYMBOLS, KC_ENT)
 #define BSP_NUM LT(LAYER_NUMERAL, KC_BSPC)
-#define PT_Z LT(LAYER_POINTER, KC_Z)
-#define PT_SLSH LT(LAYER_POINTER, KC_SLSH)
+#define PT_Z LT(LAYER_POINTER, FR_Z)
+#define PT_COLN LT(LAYER_POINTER, FR_COLN)
 
 #ifndef POINTING_DEVICE_ENABLE
 #    define DRGSCRL KC_NO
@@ -51,10 +51,10 @@ enum dilemma_keymap_layers {
 /** \brief QWERTY layout (3 rows, 10 columns). */
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [LAYER_BASE] = LAYOUT_split_3x5_3(
-       KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,
-       LGUI_T(KC_A), LALT_T(KC_S), LCTL_T(KC_D), LSFT_T(KC_F), KC_G, KC_H, LSFT_T(KC_J), LCTL_T(KC_K), LALT_T(KC_L), LGUI_T(KC_QUOT),
-       PT_Z,    RALT_T(KC_X),    KC_C,    KC_V,    KC_B,    KC_N,    KC_M, KC_COMM,  RALT_T(KC_DOT), PT_SLSH,
-                      ESC_MED, TAB_FUN, SPC_NAV, ENT_SYM, BSP_NUM, KC_MUTE
+       FR_Q,         FR_W,         FR_F,         FR_P,         FR_G,        FR_J,    FR_L,         FR_O,         FR_Y,            FR_QUOT,
+       LCTL_T(FR_A), LALT_T(FR_R), LGUI_T(FR_S), LSFT_T(FR_T), FR_D,        FR_H,    LSFT_T(FR_N), LGUI_T(FR_E), LALT_T(FR_I),    LCTL_T(FR_U),
+       PT_Z,         RALT_T(FR_X), FR_C,         FR_V,         FR_B,        FR_K,    FR_M,         FR_COMM,      RALT_T(FR_COMM), PT_COLN,
+                                   ESC_MED,      TAB_FUN,      SPC_NAV,     ENT_SYM, BSP_NUM,      KC_MUTE
   ),
 
 /*
