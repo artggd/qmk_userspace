@@ -17,27 +17,36 @@
  */
 
 #include QMK_KEYBOARD_H
-#include "keymap_french.h"
+#include "keymap_french_mac_iso.h"
 
 enum dilemma_keymap_layers {
     LAYER_BASE = 0,
-    LAYER_FUNCTION,
-    LAYER_NAVIGATION,
+    LAYER_NAV,
     LAYER_MEDIA,
+    LAYER_NUM,
+    LAYER_SYM,
+    LAYER_FUN,
     LAYER_POINTER,
-    LAYER_NUMERAL,
-    LAYER_SYMBOLS,
+};
+
+enum custom_keycodes {
+    MC_PAREN = SAFE_RANGE,  // Types () and moves cursor inside
+    MC_BRACK,               // Types [] and moves cursor inside
+    MC_CURLY,               // Types {} and moves cursor inside
+    MC_BTICK,               // Types `` and moves cursor inside
 };
 
 // Automatically enable sniping-mode on the pointer layer.
 #define DILEMMA_AUTO_SNIPING_ON_LAYER LAYER_POINTER
 
+// Layer-tap defines (ZMK thumb layout: ESC/Media, Space/Nav, Tab/Shift | Enter/Fun, Backspace/Sym, Shift/Num)
 #define ESC_MED LT(LAYER_MEDIA, KC_ESC)
-#define SPC_NAV LT(LAYER_NAVIGATION, KC_SPC)
-#define TAB_FUN LT(LAYER_FUNCTION, KC_TAB)
-#define ENT_SYM LT(LAYER_SYMBOLS, KC_ENT)
-#define BSP_NUM LT(LAYER_NUMERAL, KC_BSPC)
-#define PT_Z LT(LAYER_POINTER, FR_Z)
+#define SPC_NAV LT(LAYER_NAV, KC_SPC)
+#define TAB_SFT MT(MOD_LSFT, KC_TAB)
+#define ENT_FUN LT(LAYER_FUN, KC_ENT)
+#define BSP_SYM LT(LAYER_SYM, KC_BSPC)
+#define SFT_NUM LT(LAYER_NUM, KC_LSFT)
+#define PT_Z    LT(LAYER_POINTER, FR_Z)
 #define PT_COLN LT(LAYER_POINTER, FR_COLN)
 
 #ifndef POINTING_DEVICE_ENABLE
@@ -48,105 +57,119 @@ enum dilemma_keymap_layers {
 #endif // !POINTING_DEVICE_ENABLE
 
 // clang-format off
-/** \brief QWERTY layout (3 rows, 10 columns). */
+/** \brief COLEMAK-DH layout adapted from ZMK config (3 rows, 10 columns). */
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+  /* BASE Layer - Colemak-DH with home row mods
+   * ZMK thumb layout: ESC/Media, Space/Nav, Tab/Shift | Enter/Fun, Backspace/Sym, Shift/Num
+   */
   [LAYER_BASE] = LAYOUT_split_3x5_3(
-       FR_Q,         FR_W,         FR_F,         FR_P,         FR_G,        FR_J,    FR_L,         FR_O,         FR_Y,            FR_QUOT,
-       LCTL_T(FR_A), LALT_T(FR_R), LGUI_T(FR_S), LSFT_T(FR_T), FR_D,        FR_H,    LSFT_T(FR_N), LGUI_T(FR_E), LALT_T(FR_I),    LCTL_T(FR_U),
-       PT_Z,         RALT_T(FR_X), FR_C,         FR_V,         FR_B,        FR_K,    FR_M,         FR_COMM,      RALT_T(FR_COMM), PT_COLN,
-                                   ESC_MED,      TAB_FUN,      SPC_NAV,     ENT_SYM, BSP_NUM,      KC_MUTE
+       FR_Q,         FR_W,         FR_F,         FR_P,         FR_G,        FR_J,    FR_L,         FR_O,         FR_Y,         FR_QUOT,
+       LCTL_T(FR_A), LALT_T(FR_R), LGUI_T(FR_S), LSFT_T(FR_T), FR_D,        FR_H,    RSFT_T(FR_N), RGUI_T(FR_E), LALT_T(FR_I), RCTL_T(FR_U),
+       PT_Z,         RALT_T(FR_X), FR_C,         FR_V,         FR_B,        FR_K,    FR_M,         FR_COMM,      FR_SCLN,      PT_COLN,
+                                   ESC_MED,      SPC_NAV,      TAB_SFT,     ENT_FUN, BSP_SYM,      SFT_NUM
   ),
 
-/*
- * Layers used on the Dilemma.
- *
- * These layers started off heavily inspired by the Miryoku layout, but trimmed
- * down and tailored for a stock experience that is meant to be fundation for
- * further personalization.
- *
- * See https://github.com/manna-harbour/miryoku for the original layout.
- */
-
-/**
- * \brief Function layer.
- *
- * Secondary right-hand layer has function keys mirroring the numerals on the
- * primary layer with extras on the pinkie column, plus system keys on the inner
- * column. App is on the tertiary thumb key and other thumb keys are duplicated
- * from the base layer to enable auto-repeat.
- */
-  [LAYER_FUNCTION] = LAYOUT_split_3x5_3(
-    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, KC_PSCR,   KC_F7,   KC_F8,   KC_F9,  KC_F12,
-    KC_LGUI, KC_LALT, KC_LCTL, KC_LSFT, XXXXXXX, KC_SCRL,   KC_F4,   KC_F5,   KC_F6,  KC_F11,
-    XXXXXXX, KC_RALT, XXXXXXX, XXXXXXX, XXXXXXX, KC_PAUS,   KC_F1,   KC_F2,   KC_F3,  KC_F10,
-                      XXXXXXX, _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX
+  /* NAV Layer - Navigation and clipboard (from ZMK)
+   * Left: Undo, Cut, Copy, Paste, Redo + modifiers
+   * Right: Arrows, Home/End, PgUp/PgDn
+   */
+  [LAYER_NAV] = LAYOUT_split_3x5_3(
+    G(KC_Z),  G(KC_X), G(KC_C), G(KC_V), G(S(KC_Z)),   XXXXXXX, KC_HOME, KC_UP,   KC_END,  XXXXXXX,
+    KC_LCTL,  KC_LALT, KC_LGUI, KC_LSFT, G(KC_D),      KC_CAPS, KC_LEFT, KC_DOWN, KC_RGHT, KC_PGUP,
+    XXXXXXX,  KC_RALT, XXXXXXX, XXXXXXX, XXXXXXX,      XXXXXXX, XXXXXXX, KC_APP,  XXXXXXX, KC_PGDN,
+                       XXXXXXX, _______, XXXXXXX,      _______, _______, _______
   ),
 
-/**
- * \brief Navigation layer.
- *
- * Primary right-hand layer (left home thumb) is navigation and editing. Cursor
- * keys are on the home position, line and page movement below, clipboard above,
- * caps lock and insert on the inner column. Thumb keys are duplicated from the
- * base layer to avoid having to layer change mid edit and to enable auto-repeat.
- */
-  [LAYER_NAVIGATION] = LAYOUT_split_3x5_3(
-    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-    KC_LGUI, KC_LALT, KC_LCTL, KC_LSFT, XXXXXXX, KC_CAPS, KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT,
-    XXXXXXX, KC_RALT, XXXXXXX, XXXXXXX, XXXXXXX,  KC_INS, KC_HOME, KC_PGDN, KC_PGUP,  KC_END,
-                      XXXXXXX, XXXXXXX, _______,  KC_ENT, KC_BSPC, KC_DEL
-  ),
-
-/**
- * \brief Media layer.
- *
- * Tertiary left- and right-hand layer is media and RGB control.  This layer is
- * symmetrical to accomodate the left- and right-hand trackball.
- */
+  /* MEDIA Layer - Media controls and bootloader (from ZMK) */
   [LAYER_MEDIA] = LAYOUT_split_3x5_3(
-    XXXXXXX, RM_PREV, RM_TOGG, RM_NEXT, XXXXXXX, XXXXXXX, RM_PREV, RM_TOGG, RM_NEXT, XXXXXXX,
-    KC_MPRV, KC_VOLD, KC_MUTE, KC_VOLU, KC_MNXT, KC_MPRV, KC_VOLD, KC_MUTE, KC_VOLU, KC_MNXT,
-    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-                      _______, KC_MPLY, KC_MSTP, KC_MSTP, KC_MPLY, KC_MUTE
+    QK_BOOT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, QK_BOOT,
+    KC_LCTL, KC_LALT, KC_LGUI, KC_LSFT, XXXXXXX,    XXXXXXX, KC_MPRV, KC_VOLD, KC_VOLU, KC_MNXT,
+    XXXXXXX, KC_RALT, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX, KC_BRID, KC_BRIU, XXXXXXX,
+                      _______, XXXXXXX, XXXXXXX,    KC_MSTP, KC_MPLY, KC_MUTE
   ),
 
-/** \brief Mouse emulation and pointer functions. */
+  /* NUM Layer - Numpad layout (from ZMK)
+   * Uses keypad codes (KC_Px) for layout-independent numbers
+   */
+  [LAYER_NUM] = LAYOUT_split_3x5_3(
+    MC_BTICK, KC_P7,   KC_P8,   KC_P9,   FR_BSLS,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+    FR_PLUS,  KC_P4,   KC_P5,   KC_P6,   FR_ASTR,    XXXXXXX, KC_RSFT, KC_RGUI, KC_LALT, KC_RCTL,
+    FR_MINS,  KC_P1,   KC_P2,   KC_P3,   FR_SLSH,    XXXXXXX, XXXXXXX, XXXXXXX, KC_RALT, XXXXXXX,
+                       KC_PDOT, KC_P0,   FR_EQL,     XXXXXXX, XXXXXXX, _______
+  ),
+
+  /* SYM Layer - Symbols with auto-pair brackets (from ZMK)
+   * Uses FR_ keycodes for AZERTY layout
+   */
+  [LAYER_SYM] = LAYOUT_split_3x5_3(
+    FR_TILD, FR_PERC, FR_CIRC, FR_UNDS, MC_BRACK,   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+    FR_PIPE, FR_AT,   FR_DLR,  FR_MINS, MC_PAREN,   XXXXXXX, KC_RSFT, KC_RGUI, KC_LALT, KC_RCTL,
+    FR_HASH, FR_AMPR, FR_EURO, FR_EQL,  MC_CURLY,   XXXXXXX, XXXXXXX, XXXXXXX, KC_RALT, XXXXXXX,
+                      FR_LABK, _______, FR_RABK,    _______, XXXXXXX, XXXXXXX
+  ),
+
+  /* FUN Layer - Function keys (from ZMK)
+   * F keys arranged: F7-F9/F12 (top), F4-F6/F11 (mid), F1-F3/F10 (bottom)
+   */
+  [LAYER_FUN] = LAYOUT_split_3x5_3(
+    XXXXXXX, KC_F7,   KC_F8,   KC_F9,   KC_F12,     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+    XXXXXXX, KC_F4,   KC_F5,   KC_F6,   KC_F11,     XXXXXXX, KC_RSFT, KC_RGUI, KC_LALT, KC_RCTL,
+    XXXXXXX, KC_F1,   KC_F2,   KC_F3,   KC_F10,     XXXXXXX, XXXXXXX, XXXXXXX, KC_RALT, XXXXXXX,
+                      XXXXXXX, XXXXXXX, G(S(KC_4)), _______, XXXXXXX, XXXXXXX
+  ),
+
+  /* POINTER Layer - Mouse emulation and pointer functions (kept from original) */
   [LAYER_POINTER] = LAYOUT_split_3x5_3(
     QK_BOOT,  EE_CLR, XXXXXXX, DPI_MOD, S_D_MOD, S_D_MOD, DPI_MOD, XXXXXXX,  EE_CLR, QK_BOOT,
     KC_LGUI, KC_LALT, KC_LCTL, KC_LSFT, XXXXXXX, XXXXXXX, KC_LSFT, KC_LCTL, KC_LALT, KC_LGUI,
     _______, DRGSCRL, SNIPING, MS_BTN3, XXXXXXX, XXXXXXX, MS_BTN3, SNIPING, DRGSCRL, _______,
                       MS_BTN3, MS_BTN2, MS_BTN1, MS_BTN1, MS_BTN2, MS_BTN3
   ),
-
-/**
- * \brief Numeral layout.
- *
- * Primary left-hand layer (right home thumb) is numerals and symbols. Numerals
- * are in the standard numpad locations with symbols in the remaining positions.
- * `KC_DOT` is duplicated from the base layer.
- */
-  [LAYER_NUMERAL] = LAYOUT_split_3x5_3(
-    KC_LBRC,    KC_7,    KC_8,    KC_9, KC_RBRC, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-    KC_SCLN,    KC_4,    KC_5,    KC_6,  KC_EQL, XXXXXXX, KC_LSFT, KC_LCTL, KC_LALT, KC_LGUI,
-     KC_DOT,    KC_1,    KC_2,    KC_3, KC_BSLS, XXXXXXX, XXXXXXX, XXXXXXX, KC_RALT, XXXXXXX,
-                       KC_DOT, KC_MINS,    KC_0, XXXXXXX, _______, XXXXXXX
-  ),
-
-/**
- * \brief Symbols layer.
- *
- * Secondary left-hand layer has shifted symbols in the same locations to reduce
- * chording when using mods with shifted symbols. `KC_LPRN` is duplicated next to
- * `KC_RPRN`.
- */
-  [LAYER_SYMBOLS] = LAYOUT_split_3x5_3(
-    KC_LCBR, KC_AMPR, KC_ASTR, KC_LPRN, KC_RCBR, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-    KC_COLN,  KC_DLR, KC_PERC, KC_CIRC, KC_PLUS, XXXXXXX, KC_LSFT, KC_LCTL, KC_LALT, KC_LGUI,
-    KC_TILD, KC_EXLM,   KC_AT, KC_HASH, KC_PIPE, XXXXXXX, XXXXXXX, XXXXXXX, KC_RALT, XXXXXXX,
-                      KC_RPRN,  KC_GRV, KC_UNDS, _______, XXXXXXX, XXXXXXX
-  ),
 };
 // clang-format on
+
+// Auto-pair bracket macros (Mac AZERTY key sequences)
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case MC_PAREN:
+            if (record->event.pressed) {
+                // () on Mac AZERTY: KC_5 = (, KC_MINS = )
+                tap_code(KC_5);
+                tap_code(KC_MINS);
+                tap_code(KC_LEFT);
+            }
+            return false;
+        case MC_BRACK:
+            if (record->event.pressed) {
+                // [] on Mac AZERTY: Shift+Option+5, Shift+Option+)
+                register_mods(MOD_BIT(KC_LSFT) | MOD_BIT(KC_LALT));
+                tap_code(KC_5);
+                tap_code(KC_MINS);
+                unregister_mods(MOD_BIT(KC_LSFT) | MOD_BIT(KC_LALT));
+                tap_code(KC_LEFT);
+            }
+            return false;
+        case MC_CURLY:
+            if (record->event.pressed) {
+                // {} on Mac AZERTY: Option+5, Option+)
+                register_mods(MOD_BIT(KC_LALT));
+                tap_code(KC_5);
+                tap_code(KC_MINS);
+                unregister_mods(MOD_BIT(KC_LALT));
+                tap_code(KC_LEFT);
+            }
+            return false;
+        case MC_BTICK:
+            if (record->event.pressed) {
+                // `` on Mac AZERTY: FR_GRV = KC_NUHS (direct key, not dead)
+                tap_code(KC_NUHS);
+                tap_code(KC_NUHS);
+                tap_code(KC_LEFT);
+            }
+            return false;
+    }
+    return true;
+}
 
 #ifdef POINTING_DEVICE_ENABLE
 #    ifdef DILEMMA_AUTO_SNIPING_ON_LAYER
@@ -160,13 +183,13 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 #ifdef ENCODER_MAP_ENABLE
 // clang-format off
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
-    [LAYER_BASE]       = {ENCODER_CCW_CW(MS_WHLD, MS_WHLU),  ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
-    [LAYER_FUNCTION]   = {ENCODER_CCW_CW(KC_DOWN, KC_UP),    ENCODER_CCW_CW(KC_LEFT, KC_RGHT)},
-    [LAYER_NAVIGATION] = {ENCODER_CCW_CW(KC_PGDN, KC_PGUP),  ENCODER_CCW_CW(KC_VOLU, KC_VOLD)},
-    [LAYER_MEDIA]      = {ENCODER_CCW_CW(KC_PGDN, KC_PGUP),  ENCODER_CCW_CW(KC_VOLU, KC_VOLD)},
-    [LAYER_POINTER]    = {ENCODER_CCW_CW(RM_HUED, RM_HUEU),  ENCODER_CCW_CW(RM_SATD, RM_SATU)},
-    [LAYER_NUMERAL]    = {ENCODER_CCW_CW(RM_VALD, RM_VALU),  ENCODER_CCW_CW(RM_SPDD, RM_SPDU)},
-    [LAYER_SYMBOLS]    = {ENCODER_CCW_CW(RM_PREV, RM_NEXT),  ENCODER_CCW_CW(KC_LEFT, KC_RGHT)},
+    [LAYER_BASE]    = {ENCODER_CCW_CW(MS_WHLD, MS_WHLU), ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
+    [LAYER_NAV]     = {ENCODER_CCW_CW(KC_PGDN, KC_PGUP), ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
+    [LAYER_MEDIA]   = {ENCODER_CCW_CW(KC_PGDN, KC_PGUP), ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
+    [LAYER_NUM]     = {ENCODER_CCW_CW(RM_VALD, RM_VALU), ENCODER_CCW_CW(RM_SPDD, RM_SPDU)},
+    [LAYER_SYM]     = {ENCODER_CCW_CW(RM_PREV, RM_NEXT), ENCODER_CCW_CW(KC_LEFT, KC_RGHT)},
+    [LAYER_FUN]     = {ENCODER_CCW_CW(KC_DOWN, KC_UP),   ENCODER_CCW_CW(KC_LEFT, KC_RGHT)},
+    [LAYER_POINTER] = {ENCODER_CCW_CW(RM_HUED, RM_HUEU), ENCODER_CCW_CW(RM_SATD, RM_SATU)},
 };
 // clang-format on
 #endif // ENCODER_MAP_ENABLE
