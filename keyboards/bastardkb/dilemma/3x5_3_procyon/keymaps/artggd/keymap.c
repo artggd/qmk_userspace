@@ -153,7 +153,14 @@ uint16_t get_flow_tap_term(uint16_t keycode, keyrecord_t *record, uint16_t flow_
         case RCTL_T(FR_U):
         // AltGr on bottom row
         case RALT_T(FR_X):
-            return 0;  // Disable Flow Tap for HRMs
+        // Thumb keys
+        case LT(LAYER_MEDIA, KC_ESC):   // ESC_MED
+        case LT(LAYER_NAV, KC_SPC):     // SPC_NAV
+        case LSFT_T(KC_TAB):            // TAB_SFT
+        case LT(LAYER_FUN, KC_ENT):     // ENT_FUN
+        case LT(LAYER_SYM, KC_BSPC):    // BSP_SYM
+        case LT(LAYER_NUM, KC_LSFT):    // SFT_NUM
+            return 0;  // Disable Flow Tap for HRMs and thumb keys
         default:
             return flow_tap_term;  // Use default for other keys
     }
