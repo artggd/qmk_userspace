@@ -37,7 +37,7 @@ enum custom_keycodes {
 };
 
 // Automatically enable sniping-mode on the pointer layer.
-#define DILEMMA_AUTO_SNIPING_ON_LAYER LAYER_POINTER
+// #define DILEMMA_AUTO_SNIPING_ON_LAYER LAYER_POINTER
 
 // Layer-tap defines (ZMK thumb layout: ESC/Media, Space/Nav, Tab/Shift | Enter/Fun, Backspace/Sym, Shift/Num)
 #define ESC_MED LT(LAYER_MEDIA, KC_ESC)
@@ -188,6 +188,12 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     return state;
 }
 #    endif // DILEMMA_AUTO_SNIPING_ON_LAYER
+
+report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
+    // Invert scroll direction (natural scrolling)
+    mouse_report.v = -mouse_report.v;
+    return mouse_report;
+}
 #endif     // POINTING_DEVICE_ENABLE
 
 #ifdef ENCODER_MAP_ENABLE
