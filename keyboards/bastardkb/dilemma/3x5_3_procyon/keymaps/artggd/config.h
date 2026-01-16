@@ -26,8 +26,10 @@
 // https://github.com/urob/zmk-config#timeless-homerow-mods
 #define TAPPING_TERM 250
 #define PERMISSIVE_HOLD
-#define FLOW_TAP_TERM 150
+#define FLOW_TAP_TERM 100
+#define FLOW_TAP_TERM_PER_KEY
 #define CHORDAL_HOLD
+//#define SPECULATIVE_HOLD
 
 // Significantly reduce trackpad sensitivity (lower DPI = less sensitive)
 #define DILEMMA_MINIMUM_DEFAULT_DPI 100

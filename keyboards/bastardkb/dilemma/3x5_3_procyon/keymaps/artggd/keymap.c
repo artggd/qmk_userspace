@@ -138,6 +138,27 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 // clang-format on
 
+// Disable Flow Tap for home row mods so they work after thumb keys
+uint16_t get_flow_tap_term(uint16_t keycode, keyrecord_t *record, uint16_t flow_tap_term) {
+    switch (keycode) {
+        // Left hand HRMs
+        case LCTL_T(FR_A):
+        case LALT_T(FR_R):
+        case LGUI_T(FR_S):
+        case LSFT_T(FR_T):
+        // Right hand HRMs
+        case RSFT_T(FR_N):
+        case RGUI_T(FR_E):
+        case LALT_T(FR_I):
+        case RCTL_T(FR_U):
+        // AltGr on bottom row
+        case RALT_T(FR_X):
+            return 0;  // Disable Flow Tap for HRMs
+        default:
+            return flow_tap_term;  // Use default for other keys
+    }
+}
+
 // Auto-pair bracket macros (Mac AZERTY key sequences)
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
