@@ -19,6 +19,18 @@
 #include QMK_KEYBOARD_H
 #include "keymap_french_mac_iso.h"
 
+// Fix buggy Mac AZERTY keycodes in keymap_french_mac_iso.h
+// Observed: KC_GRV produces <, KC_NUBS produces @
+#undef FR_LABK
+#undef FR_RABK
+#undef FR_HASH
+#undef FR_AT
+
+#define FR_LABK KC_GRV      // < (was KC_NUBS producing @)
+#define FR_RABK S(KC_GRV)   // > (was S(KC_NUBS) producing #)
+#define FR_HASH S(KC_NUBS)  // # (was S(KC_GRV) producing >)
+#define FR_AT   KC_NUBS     // @ (was KC_GRV producing <)
+
 enum dilemma_keymap_layers {
     LAYER_BASE = 0,
     LAYER_NAV,
@@ -26,6 +38,7 @@ enum dilemma_keymap_layers {
     LAYER_NUM,
     LAYER_SYM,
     LAYER_FUN,
+    LAYER_SFT_SYM,
     LAYER_POINTER,
 };
 
@@ -112,10 +125,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    * Uses FR_ keycodes for AZERTY layout
    */
   [LAYER_SYM] = LAYOUT_split_3x5_3(
-    FR_TILD, FR_PERC, FR_CIRC, FR_UNDS, MC_BRACK,   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-    FR_PIPE, FR_AT,   FR_DLR,  FR_MINS, MC_PAREN,   XXXXXXX, KC_RSFT, KC_RGUI, KC_LALT, KC_RCTL,
-    FR_HASH, FR_AMPR, FR_EURO, FR_EQL,  MC_CURLY,   XXXXXXX, XXXXXXX, XXXXXXX, KC_RALT, XXXXXXX,
-                      FR_LABK, _______, FR_RABK,    _______, XXXXXXX, XXXXXXX
+    FR_TILD,            FR_PERC, FR_CIRC, FR_UNDS, MC_BRACK,   XXXXXXX, XXXXXXX,          XXXXXXX, XXXXXXX, XXXXXXX,
+    MT(MOD_LSFT,FR_BSLS), FR_AT, FR_DLR,  FR_MINS, MC_PAREN,   XXXXXXX, MO(LAYER_SFT_SYM), KC_RGUI, KC_LALT, KC_RCTL,
+    FR_HASH,            FR_AMPR, FR_EURO, FR_EQL,  MC_CURLY,   XXXXXXX, XXXXXXX,          XXXXXXX, KC_RALT, XXXXXXX,
+                        FR_LABK, MO(LAYER_NAV), FR_RABK,       _______, XXXXXXX,          XXXXXXX
   ),
 
   /* FUN Layer - Function keys (from ZMK)
@@ -126,6 +139,16 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     XXXXXXX, KC_F4,   KC_F5,   KC_F6,   KC_F11,     XXXXXXX, KC_RSFT, KC_RGUI, KC_LALT, KC_RCTL,
     XXXXXXX, KC_F1,   KC_F2,   KC_F3,   KC_F10,     XXXXXXX, XXXXXXX, XXXXXXX, KC_RALT, XXXXXXX,
                       XXXXXXX, XXXXXXX, G(S(KC_4)), _______, XXXXXXX, XXXXXXX
+  ),
+
+  /* SFT_SYM Layer - Individual bracket keys (accessed from SYM layer)
+   * Provides single brackets without auto-pairing
+   */
+  [LAYER_SFT_SYM] = LAYOUT_split_3x5_3(
+    XXXXXXX, XXXXXXX, XXXXXXX, FR_LBRC, FR_RBRC,   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+    XXXXXXX, XXXXXXX, XXXXXXX, FR_LPRN, FR_RPRN,   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+    XXXXXXX, XXXXXXX, XXXXXXX, FR_LCBR, FR_RCBR,   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+                      XXXXXXX, XXXXXXX, XXXXXXX,   XXXXXXX, XXXXXXX, XXXXXXX
   ),
 
   /* POINTER Layer - Mouse emulation and pointer functions (kept from original) */
@@ -233,6 +256,7 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
     [LAYER_NUM]     = {ENCODER_CCW_CW(RM_VALD, RM_VALU), ENCODER_CCW_CW(RM_SPDD, RM_SPDU)},
     [LAYER_SYM]     = {ENCODER_CCW_CW(RM_PREV, RM_NEXT), ENCODER_CCW_CW(KC_LEFT, KC_RGHT)},
     [LAYER_FUN]     = {ENCODER_CCW_CW(KC_DOWN, KC_UP),   ENCODER_CCW_CW(KC_LEFT, KC_RGHT)},
+    [LAYER_SFT_SYM] = {ENCODER_CCW_CW(RM_PREV, RM_NEXT), ENCODER_CCW_CW(KC_LEFT, KC_RGHT)},
     [LAYER_POINTER] = {ENCODER_CCW_CW(RM_HUED, RM_HUEU), ENCODER_CCW_CW(RM_SATD, RM_SATU)},
 };
 // clang-format on
