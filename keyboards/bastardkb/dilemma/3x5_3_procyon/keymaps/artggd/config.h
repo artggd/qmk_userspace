@@ -21,3 +21,10 @@
 #define SPLIT_LED_STATE_ENABLE
 
 #define ENCODER_RESOLUTION 4
+
+// Timeless Home Row Mods Configuration (urob-style)
+// https://github.com/urob/zmk-config#timeless-homerow-mods
+#define TAPPING_TERM 250
+#define PERMISSIVE_HOLD
+#define FLOW_TAP_TERM 150
+#define CHORDAL_HOLD

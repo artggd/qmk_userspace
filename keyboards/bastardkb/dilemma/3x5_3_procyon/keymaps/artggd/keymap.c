@@ -56,6 +56,16 @@ enum custom_keycodes {
 #    define SNIPING KC_NO
 #endif // !POINTING_DEVICE_ENABLE
 
+// Chordal Hold layout for opposite-hands rule (required for CHORDAL_HOLD)
+// 'L' = left hand, 'R' = right hand, '*' = thumb (bilateral)
+const char chordal_hold_layout[MATRIX_ROWS][MATRIX_COLS] PROGMEM =
+    LAYOUT_split_3x5_3(
+        'L', 'L', 'L', 'L', 'L',  'R', 'R', 'R', 'R', 'R',
+        'L', 'L', 'L', 'L', 'L',  'R', 'R', 'R', 'R', 'R',
+        'L', 'L', 'L', 'L', 'L',  'R', 'R', 'R', 'R', 'R',
+                  '*', '*', '*',  '*', '*', '*'
+    );
+
 // clang-format off
 /** \brief COLEMAK-DH layout adapted from ZMK config (3 rows, 10 columns). */
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
