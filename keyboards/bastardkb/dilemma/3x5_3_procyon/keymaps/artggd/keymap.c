@@ -40,6 +40,13 @@ enum dilemma_keymap_layers {
     LAYER_FUN,
     LAYER_SFT_SYM,
     LAYER_POINTER,
+    // Diacritics layers (accessed via layer-tap on base layer)
+    LAYER_DIAC_ACUTE,   // Hold F → é
+    LAYER_DIAC_RGRAVE,  // Hold P → è, ù
+    LAYER_DIAC_LGRAVE,  // Hold O → à
+    LAYER_DIAC_RCIRC,   // Hold W → ô, ê, î, û
+    LAYER_DIAC_LCIRC,   // Hold Y → â
+    LAYER_DIAC_TREMA,   // Hold G → ë, ï, ü, ÿ
 };
 
 enum custom_keycodes {
@@ -48,6 +55,22 @@ enum custom_keycodes {
     MC_CURLY,               // Types {} and moves cursor inside
     MC_BTICK,               // Types `` and moves cursor inside
     MC_SQTDQ,               // ' normally, " when shifted (mod morph)
+    // Circumflex characters (dead key + letter)
+    MC_ACIR,                // â
+    MC_ECIR,                // ê
+    MC_ICIR,                // î
+    MC_OCIR,                // ô
+    MC_UCIR,                // û
+    // Trema/diaeresis characters (dead key + letter)
+    MC_EDIA,                // ë
+    MC_IDIA,                // ï
+    MC_UDIA,                // ü
+    MC_YDIA,                // ÿ
+    // Direct accented keys with shift support (for uppercase via CapsLock)
+    MC_EACU,                // é/É
+    MC_EGRV,                // è/È
+    MC_AGRV,                // à/À
+    MC_UGRV,                // ù/Ù
 };
 
 // Automatically enable sniping-mode on the pointer layer.
@@ -62,6 +85,14 @@ enum custom_keycodes {
 #define SFT_NUM LT(LAYER_NUM, KC_LSFT)
 #define PT_Z    LT(LAYER_POINTER, FR_Z)
 #define PT_COLN LT(LAYER_POINTER, FR_COLN)
+
+// Diacritics layer-taps (matching ZMK layout)
+#define W_RCIRC LT(LAYER_DIAC_RCIRC, FR_W)   // Hold W → circumflex layer (right: ô, ê, î, û)
+#define F_ACUTE LT(LAYER_DIAC_ACUTE, FR_F)   // Hold F → acute layer (é)
+#define P_RGRAV LT(LAYER_DIAC_RGRAVE, FR_P)  // Hold P → grave layer (right: è, ù)
+#define G_TREMA LT(LAYER_DIAC_TREMA, FR_G)   // Hold G → trema layer (ë, ï, ü, ÿ)
+#define O_LGRAV LT(LAYER_DIAC_LGRAVE, FR_O)  // Hold O → grave layer (left: à)
+#define Y_LCIRC LT(LAYER_DIAC_LCIRC, FR_Y)   // Hold Y → circumflex layer (left: â)
 
 // Combos
 // Y + ' -> !
@@ -94,7 +125,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    * ZMK thumb layout: ESC/Media, Space/Nav, Tab/Shift | Enter/Fun, Backspace/Sym, Shift/Num
    */
   [LAYER_BASE] = LAYOUT_split_3x5_3(
-       FR_Q,         FR_W,         FR_F,         FR_P,         FR_G,        FR_J,    FR_L,         FR_O,         FR_Y,         MC_SQTDQ,
+       FR_Q,         W_RCIRC,      F_ACUTE,      P_RGRAV,      G_TREMA,     FR_J,    FR_L,         O_LGRAV,      Y_LCIRC,      MC_SQTDQ,
        LCTL_T(FR_A), LALT_T(FR_R), LGUI_T(FR_S), LSFT_T(FR_T), FR_D,        FR_H,    RSFT_T(FR_N), RGUI_T(FR_E), LALT_T(FR_I), RCTL_T(FR_U),
        PT_Z,         RALT_T(FR_X), FR_C,         FR_V,         FR_B,        FR_K,    FR_M,         FR_COMM,      FR_SCLN,      PT_COLN,
                                    ESC_MED,      SPC_NAV,      TAB_SFT,     ENT_FUN, BSP_SYM,      SFT_NUM
@@ -166,6 +197,54 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     _______, DRGSCRL, SNIPING, MS_BTN3, XXXXXXX, XXXXXXX, MS_BTN3, SNIPING, DRGSCRL, _______,
                       MS_BTN3, MS_BTN2, MS_BTN1, MS_BTN1, MS_BTN2, MS_BTN3
   ),
+
+  /* DIAC_ACUTE Layer - Hold F to access é/É (shift-aware) */
+  [LAYER_DIAC_ACUTE] = LAYOUT_split_3x5_3(
+    _______, _______, _______, XXXXXXX, _______,   _______, _______, _______, _______, _______,
+    _______, _______, _______, _______, _______,   _______, _______, MC_EACU, _______, _______,
+    _______, _______, _______, _______, _______,   _______, _______, _______, _______, _______,
+                      _______, _______, _______,   _______, _______, _______
+  ),
+
+  /* DIAC_RGRAVE Layer - Hold P to access è/È, ù/Ù (shift-aware) */
+  [LAYER_DIAC_RGRAVE] = LAYOUT_split_3x5_3(
+    _______, _______, XXXXXXX, _______, _______,   _______, _______, _______, _______, _______,
+    _______, _______, _______, _______, _______,   _______, _______, MC_EGRV, _______, MC_UGRV,
+    _______, _______, _______, _______, _______,   _______, _______, _______, _______, _______,
+                      _______, _______, _______,   _______, _______, _______
+  ),
+
+  /* DIAC_LGRAVE Layer - Hold O to access à/À (shift-aware) */
+  [LAYER_DIAC_LGRAVE] = LAYOUT_split_3x5_3(
+    _______, _______, _______, _______, _______,   _______, _______, XXXXXXX, _______, _______,
+    MC_AGRV, _______, _______, _______, _______,   _______, _______, _______, _______, _______,
+    _______, _______, _______, _______, _______,   _______, _______, _______, _______, _______,
+                      _______, _______, _______,   _______, _______, _______
+  ),
+
+  /* DIAC_RCIRC Layer - Hold W to access ô/Ô, ê/Ê, î/Î, û/Û (shift-aware) */
+  [LAYER_DIAC_RCIRC] = LAYOUT_split_3x5_3(
+    _______, XXXXXXX, _______, _______, _______,   _______, _______, MC_OCIR, _______, _______,
+    _______, _______, _______, _______, _______,   _______, _______, MC_ECIR, MC_ICIR, MC_UCIR,
+    _______, _______, _______, _______, _______,   _______, _______, _______, _______, _______,
+                      _______, _______, _______,   _______, _______, _______
+  ),
+
+  /* DIAC_LCIRC Layer - Hold Y to access â/Â (shift-aware) */
+  [LAYER_DIAC_LCIRC] = LAYOUT_split_3x5_3(
+    _______, _______, _______, _______, _______,   _______, _______, _______, XXXXXXX, _______,
+    MC_ACIR, _______, _______, _______, _______,   _______, _______, _______, _______, _______,
+    _______, _______, _______, _______, _______,   _______, _______, _______, _______, _______,
+                      _______, _______, _______,   _______, _______, _______
+  ),
+
+  /* DIAC_TREMA Layer - Hold G to access ë/Ë, ï/Ï, ü/Ü, ÿ/Ÿ (shift-aware) */
+  [LAYER_DIAC_TREMA] = LAYOUT_split_3x5_3(
+    _______, _______, _______, _______, XXXXXXX,   _______, _______, _______, MC_YDIA, _______,
+    _______, _______, _______, _______, _______,   _______, _______, MC_EDIA, MC_IDIA, MC_UDIA,
+    _______, _______, _______, _______, _______,   _______, _______, _______, _______, _______,
+                      _______, _______, _______,   _______, _______, _______
+  ),
 };
 // clang-format on
 
@@ -191,9 +270,34 @@ uint16_t get_flow_tap_term(uint16_t keycode, keyrecord_t *record, uint16_t flow_
         case LT(LAYER_FUN, KC_ENT):     // ENT_FUN
         case LT(LAYER_SYM, KC_BSPC):    // BSP_SYM
         case LT(LAYER_NUM, KC_LSFT):    // SFT_NUM
-            return 0;  // Disable Flow Tap for HRMs and thumb keys
+        // Diacritics layer-taps
+        case LT(LAYER_DIAC_RCIRC, FR_W):   // W_RCIRC
+        case LT(LAYER_DIAC_ACUTE, FR_F):   // F_ACUTE
+        case LT(LAYER_DIAC_RGRAVE, FR_P):  // P_RGRAV
+        case LT(LAYER_DIAC_TREMA, FR_G):   // G_TREMA
+        case LT(LAYER_DIAC_LGRAVE, FR_O):  // O_LGRAV
+        case LT(LAYER_DIAC_LCIRC, FR_Y):   // Y_LCIRC
+            return 0;  // Disable Flow Tap for HRMs, thumb keys, and diacritics
         default:
             return flow_tap_term;  // Use default for other keys
+    }
+}
+
+// Helper for shift-aware accented characters (uses CapsLock for uppercase on Mac)
+static void send_accented_char(uint16_t dead_key, uint16_t letter) {
+    uint8_t mods = get_mods() | get_oneshot_mods();
+    if (mods & MOD_MASK_SHIFT) {
+        // Clear shift, enable caps, send char, disable caps, restore shift
+        del_mods(MOD_MASK_SHIFT);
+        del_oneshot_mods(MOD_MASK_SHIFT);
+        tap_code(KC_CAPS);
+        if (dead_key) tap_code16(dead_key);
+        tap_code(letter);
+        tap_code(KC_CAPS);
+        set_mods(mods);
+    } else {
+        if (dead_key) tap_code16(dead_key);
+        tap_code(letter);
     }
 }
 
@@ -251,6 +355,48 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 }
             }
             return false;
+        // Circumflex characters: dead key (^) + letter (shift-aware)
+        case MC_ACIR:
+            if (record->event.pressed) send_accented_char(FR_CIRC, FR_A);
+            return false;
+        case MC_ECIR:
+            if (record->event.pressed) send_accented_char(FR_CIRC, FR_E);
+            return false;
+        case MC_ICIR:
+            if (record->event.pressed) send_accented_char(FR_CIRC, FR_I);
+            return false;
+        case MC_OCIR:
+            if (record->event.pressed) send_accented_char(FR_CIRC, FR_O);
+            return false;
+        case MC_UCIR:
+            if (record->event.pressed) send_accented_char(FR_CIRC, FR_U);
+            return false;
+        // Trema/diaeresis characters: dead key (¨) + letter (shift-aware)
+        case MC_EDIA:
+            if (record->event.pressed) send_accented_char(FR_DIAE, FR_E);
+            return false;
+        case MC_IDIA:
+            if (record->event.pressed) send_accented_char(FR_DIAE, FR_I);
+            return false;
+        case MC_UDIA:
+            if (record->event.pressed) send_accented_char(FR_DIAE, FR_U);
+            return false;
+        case MC_YDIA:
+            if (record->event.pressed) send_accented_char(FR_DIAE, FR_Y);
+            return false;
+        // Direct accented keys with shift support (shift-aware)
+        case MC_EACU:
+            if (record->event.pressed) send_accented_char(0, FR_LEAC);
+            return false;
+        case MC_EGRV:
+            if (record->event.pressed) send_accented_char(0, FR_LEGR);
+            return false;
+        case MC_AGRV:
+            if (record->event.pressed) send_accented_char(0, FR_LAGR);
+            return false;
+        case MC_UGRV:
+            if (record->event.pressed) send_accented_char(0, FR_LUGR);
+            return false;
     }
     return true;
 }
@@ -273,14 +419,21 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
 #ifdef ENCODER_MAP_ENABLE
 // clang-format off
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
-    [LAYER_BASE]    = {ENCODER_CCW_CW(MS_WHLD, MS_WHLU), ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
-    [LAYER_NAV]     = {ENCODER_CCW_CW(KC_PGDN, KC_PGUP), ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
-    [LAYER_MEDIA]   = {ENCODER_CCW_CW(KC_PGDN, KC_PGUP), ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
-    [LAYER_NUM]     = {ENCODER_CCW_CW(RM_VALD, RM_VALU), ENCODER_CCW_CW(RM_SPDD, RM_SPDU)},
-    [LAYER_SYM]     = {ENCODER_CCW_CW(RM_PREV, RM_NEXT), ENCODER_CCW_CW(KC_LEFT, KC_RGHT)},
-    [LAYER_FUN]     = {ENCODER_CCW_CW(KC_DOWN, KC_UP),   ENCODER_CCW_CW(KC_LEFT, KC_RGHT)},
-    [LAYER_SFT_SYM] = {ENCODER_CCW_CW(RM_PREV, RM_NEXT), ENCODER_CCW_CW(KC_LEFT, KC_RGHT)},
-    [LAYER_POINTER] = {ENCODER_CCW_CW(RM_HUED, RM_HUEU), ENCODER_CCW_CW(RM_SATD, RM_SATU)},
+    [LAYER_BASE]       = {ENCODER_CCW_CW(MS_WHLD, MS_WHLU), ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
+    [LAYER_NAV]        = {ENCODER_CCW_CW(KC_PGDN, KC_PGUP), ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
+    [LAYER_MEDIA]      = {ENCODER_CCW_CW(KC_PGDN, KC_PGUP), ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
+    [LAYER_NUM]        = {ENCODER_CCW_CW(RM_VALD, RM_VALU), ENCODER_CCW_CW(RM_SPDD, RM_SPDU)},
+    [LAYER_SYM]        = {ENCODER_CCW_CW(RM_PREV, RM_NEXT), ENCODER_CCW_CW(KC_LEFT, KC_RGHT)},
+    [LAYER_FUN]        = {ENCODER_CCW_CW(KC_DOWN, KC_UP),   ENCODER_CCW_CW(KC_LEFT, KC_RGHT)},
+    [LAYER_SFT_SYM]    = {ENCODER_CCW_CW(RM_PREV, RM_NEXT), ENCODER_CCW_CW(KC_LEFT, KC_RGHT)},
+    [LAYER_POINTER]    = {ENCODER_CCW_CW(RM_HUED, RM_HUEU), ENCODER_CCW_CW(RM_SATD, RM_SATU)},
+    // Diacritics layers inherit from base (volume/scroll)
+    [LAYER_DIAC_ACUTE]  = {ENCODER_CCW_CW(MS_WHLD, MS_WHLU), ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
+    [LAYER_DIAC_RGRAVE] = {ENCODER_CCW_CW(MS_WHLD, MS_WHLU), ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
+    [LAYER_DIAC_LGRAVE] = {ENCODER_CCW_CW(MS_WHLD, MS_WHLU), ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
+    [LAYER_DIAC_RCIRC]  = {ENCODER_CCW_CW(MS_WHLD, MS_WHLU), ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
+    [LAYER_DIAC_LCIRC]  = {ENCODER_CCW_CW(MS_WHLD, MS_WHLU), ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
+    [LAYER_DIAC_TREMA]  = {ENCODER_CCW_CW(MS_WHLD, MS_WHLU), ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
 };
 // clang-format on
 #endif // ENCODER_MAP_ENABLE
