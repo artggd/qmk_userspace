@@ -95,8 +95,8 @@ enum custom_keycodes {
 #define Y_LCIRC LT(LAYER_DIAC_LCIRC, FR_Y)   // Hold Y → circumflex layer (left: â)
 
 // Combos
-// Y + ' -> !
-const uint16_t PROGMEM combo_exlm[] = {FR_Y, MC_SQTDQ, COMBO_END};
+// O + Y -> !
+const uint16_t PROGMEM combo_exlm[] = {O_LGRAV, Y_LCIRC, COMBO_END};
 combo_t key_combos[] = {
     COMBO(combo_exlm, FR_EXLM),
 };
