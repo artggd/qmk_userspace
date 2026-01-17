@@ -294,7 +294,13 @@ uint16_t get_quick_tap_term(uint16_t keycode, keyrecord_t *record) {
         case RGUI_T(FR_E):
         case LALT_T(FR_I):
         case RCTL_T(FR_U):
-            return 0;  // Disable auto-repeat for diacritics and HRMs
+        // Thumb keys - disable auto-repeat so tap-then-hold activates layer
+        case SPC_NAV:
+        case TAB_SFT:
+        case ENT_FUN:
+        case BSP_SYM:
+        case SFT_NUM:
+            return 0;  // Disable auto-repeat for diacritics, HRMs, and thumb keys
         default:
             return QUICK_TAP_TERM;  // Use default for others
     }
