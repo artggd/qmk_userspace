@@ -158,7 +158,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    */
   [LAYER_SYM] = LAYOUT_split_3x5_3(
     FR_TILD,            FR_PERC, FR_CIRC, FR_UNDS, MC_BRACK,   XXXXXXX, XXXXXXX,          XXXXXXX, XXXXXXX, XXXXXXX,
-    MT(MOD_LSFT,FR_BSLS), FR_AT, FR_DLR,  FR_MINS, MC_PAREN,   XXXXXXX, MO(LAYER_SFT_SYM), KC_RGUI, KC_LALT, KC_RCTL,
+    MT(MOD_LSFT,KC_DOT), FR_AT, FR_DLR,  FR_MINS, MC_PAREN,   XXXXXXX, MO(LAYER_SFT_SYM), KC_RGUI, KC_LALT, KC_RCTL,
     FR_HASH,            FR_AMPR, FR_EURO, FR_EQL,  MC_CURLY,   XXXXXXX, XXXXXXX,          XXXXXXX, KC_RALT, XXXXXXX,
                         FR_LABK, MO(LAYER_NAV), FR_RABK,       _______, XXXXXXX,          XXXXXXX
   ),
@@ -385,6 +385,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 }
             }
             return false;
+        case MT(MOD_LSFT,KC_DOT):
+            // Intercept mod-tap to send backslash on tap (FR_BSLS requires Shift+Alt)
+            if (record->tap.count && record->event.pressed) {
+                tap_code16(FR_BSLS);
+                return false;
+            }
+            break;  // Let QMK handle hold (Shift)
         // Circumflex characters: dead key (^) + letter (shift-aware)
         case MC_ACIR:
             if (record->event.pressed) send_accented_char(FR_CIRC, FR_A);
