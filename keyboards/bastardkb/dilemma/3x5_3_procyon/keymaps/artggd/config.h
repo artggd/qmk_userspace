@@ -32,8 +32,8 @@
 //#define SPECULATIVE_HOLD
 
 // Significantly reduce trackpad sensitivity (lower DPI = less sensitive)
-#define DILEMMA_MINIMUM_DEFAULT_DPI 100
-#define DILEMMA_DEFAULT_DPI_CONFIG_STEP 50
+#define DILEMMA_MINIMUM_DEFAULT_DPI 70
+#define DILEMMA_DEFAULT_DPI_CONFIG_STEP 30
 
 // Invert scroll direction (natural scrolling)
 #define DILEMMA_DRAGSCROLL_REVERSE_Y
