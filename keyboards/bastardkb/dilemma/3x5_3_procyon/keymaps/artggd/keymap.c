@@ -71,6 +71,8 @@ enum custom_keycodes {
     MC_EGRV,                // è/È
     MC_AGRV,                // à/À
     MC_UGRV,                // ù/Ù
+    MC_CCED,                // ç/Ç (direct key)
+    C_CCED_HT,              // tap=c, hold=ç/Ç (hold-tap)
 };
 
 // Automatically enable sniping-mode on the pointer layer.
@@ -127,7 +129,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [LAYER_BASE] = LAYOUT_split_3x5_3(
        FR_Q,         W_RCIRC,      F_ACUTE,      P_RGRAV,      G_TREMA,     FR_J,    FR_L,         O_LGRAV,      Y_LCIRC,      MC_SQTDQ,
        LCTL_T(FR_A), LALT_T(FR_R), LGUI_T(FR_S), LSFT_T(FR_T), FR_D,        FR_H,    RSFT_T(FR_N), RGUI_T(FR_E), LALT_T(FR_I), RCTL_T(FR_U),
-       PT_Z,         RALT_T(FR_X), FR_C,         FR_V,         FR_B,        FR_K,    FR_M,         FR_COMM,      FR_SCLN,      PT_COLN,
+       PT_Z,         RALT_T(FR_X), C_CCED_HT,    FR_V,         FR_B,        FR_K,    FR_M,         FR_COMM,      FR_SCLN,      PT_COLN,
                                    ESC_MED,      SPC_NAV,      TAB_SFT,     ENT_FUN, BSP_SYM,      SFT_NUM
   ),
 
@@ -277,11 +279,17 @@ uint16_t get_flow_tap_term(uint16_t keycode, keyrecord_t *record, uint16_t flow_
         case LT(LAYER_DIAC_TREMA, FR_G):   // G_TREMA
         case LT(LAYER_DIAC_LGRAVE, FR_O):  // O_LGRAV
         case LT(LAYER_DIAC_LCIRC, FR_Y):   // Y_LCIRC
+        case C_CCED_HT:                    // C with ç hold-tap
             return 0;  // Disable Flow Tap for HRMs, thumb keys, and diacritics
         default:
             return flow_tap_term;  // Use default for other keys
     }
 }
+
+// State for C_CCED_HT hold-tap (tap=c, hold=ç)
+static uint16_t c_cced_timer = 0;
+static bool c_cced_held = false;
+static bool c_cced_fired = false;  // Track if hold action already fired
 
 // Helper for shift-aware accented characters (uses CapsLock for uppercase on Mac)
 static void send_accented_char(uint16_t dead_key, uint16_t letter) {
@@ -397,8 +405,34 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case MC_UGRV:
             if (record->event.pressed) send_accented_char(0, FR_LUGR);
             return false;
+        case MC_CCED:
+            if (record->event.pressed) send_accented_char(0, FR_LCCE);
+            return false;
+        case C_CCED_HT:
+            // Hold-tap: tap=c, hold=ç/Ç (shift-aware, fires on timer)
+            if (record->event.pressed) {
+                c_cced_timer = timer_read();
+                c_cced_held = true;
+                c_cced_fired = false;
+            } else {
+                if (c_cced_held && !c_cced_fired) {
+                    // Released before timer: send c
+                    tap_code(FR_C);
+                }
+                c_cced_held = false;
+                c_cced_fired = false;
+            }
+            return false;
     }
     return true;
+}
+
+// Check C_CCED_HT timer and fire hold action immediately when reached
+void matrix_scan_user(void) {
+    if (c_cced_held && !c_cced_fired && timer_elapsed(c_cced_timer) >= TAPPING_TERM) {
+        send_accented_char(0, FR_LCCE);
+        c_cced_fired = true;
+    }
 }
 
 #ifdef POINTING_DEVICE_ENABLE
