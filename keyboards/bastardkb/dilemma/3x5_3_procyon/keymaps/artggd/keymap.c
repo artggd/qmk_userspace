@@ -386,12 +386,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             return false;
         case MT(MOD_LSFT,KC_DOT):
-            // Intercept mod-tap to send backslash on tap (FR_BSLS requires Shift+Alt)
+            // Tap = backslash, Hold = pipe (both require complex mods)
             if (record->tap.count && record->event.pressed) {
-                tap_code16(FR_BSLS);
+                tap_code16(FR_BSLS);  // Tap: backslash
+                return false;
+            } else if (!record->tap.count && record->event.pressed) {
+                tap_code16(FR_PIPE);  // Hold: pipe
                 return false;
             }
-            break;  // Let QMK handle hold (Shift)
+            return false;
         // Circumflex characters: dead key (^) + letter (shift-aware)
         case MC_ACIR:
             if (record->event.pressed) send_accented_char(FR_CIRC, FR_A);
