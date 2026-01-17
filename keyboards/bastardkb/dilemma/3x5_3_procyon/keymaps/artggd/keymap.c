@@ -72,6 +72,7 @@ enum custom_keycodes {
     MC_UGRV,                // ù/Ù
     MC_CCED,                // ç/Ç (direct key)
     C_CCED_HT,              // tap=c, hold=ç/Ç (hold-tap)
+    BS_DEL_SYM,             // tap=backspace, rshift+tap=delete, hold=sym layer
 };
 
 // Automatically enable sniping-mode on the pointer layer.
@@ -81,7 +82,6 @@ enum custom_keycodes {
 #define SPC_NAV LT(LAYER_NAV, KC_SPC)
 #define TAB_SFT MT(MOD_LSFT, KC_TAB)
 #define ENT_FUN LT(LAYER_FUN, KC_ENT)
-#define BSP_SYM LT(LAYER_SYM, KC_BSPC)
 #define SFT_NUM LT(LAYER_NUM, KC_LSFT)
 #define PT_Z    LT(LAYER_POINTER, FR_Z)
 #define PT_COLN LT(LAYER_POINTER, FR_COLN)
@@ -100,6 +100,7 @@ const uint16_t PROGMEM combo_exlm[] = {FR_Y, MC_SQTDQ, COMBO_END};
 combo_t key_combos[] = {
     COMBO(combo_exlm, FR_EXLM),
 };
+
 
 #ifndef POINTING_DEVICE_ENABLE
 #    define DRGSCRL KC_NO
@@ -128,7 +129,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
        FR_Q,         W_RCIRC,      F_ACUTE,      P_RGRAV,      G_TREMA,     FR_J,    FR_L,         O_LGRAV,      Y_LCIRC,      MC_SQTDQ,
        LCTL_T(FR_A), LALT_T(FR_R), LGUI_T(FR_S), LSFT_T(FR_T), FR_D,        FR_H,    RSFT_T(FR_N), RGUI_T(FR_E), LALT_T(FR_I), RCTL_T(FR_U),
        PT_Z,         RALT_T(FR_X), C_CCED_HT,    FR_V,         FR_B,        FR_K,    FR_M,         FR_COMM,      FR_SCLN,      PT_COLN,
-                                   KC_ESC,       SPC_NAV,      TAB_SFT,     ENT_FUN, BSP_SYM,      SFT_NUM
+                                   KC_ESC,       SPC_NAV,      TAB_SFT,     ENT_FUN, BS_DEL_SYM,   SFT_NUM
   ),
 
   /* NAV Layer - Navigation and clipboard (from ZMK)
@@ -259,7 +260,7 @@ uint16_t get_flow_tap_term(uint16_t keycode, keyrecord_t *record, uint16_t flow_
         case LT(LAYER_NAV, KC_SPC):     // SPC_NAV
         case LSFT_T(KC_TAB):            // TAB_SFT
         case LT(LAYER_FUN, KC_ENT):     // ENT_FUN
-        case LT(LAYER_SYM, KC_BSPC):    // BSP_SYM
+        case BS_DEL_SYM:                // BS_DEL_SYM
         case LT(LAYER_NUM, KC_LSFT):    // SFT_NUM
         // Diacritics layer-taps
         case LT(LAYER_DIAC_RCIRC, FR_W):   // W_RCIRC
@@ -298,7 +299,7 @@ uint16_t get_quick_tap_term(uint16_t keycode, keyrecord_t *record) {
         case SPC_NAV:
         case TAB_SFT:
         case ENT_FUN:
-        case BSP_SYM:
+        case BS_DEL_SYM:
         case SFT_NUM:
             return 0;  // Disable auto-repeat for diacritics, HRMs, and thumb keys
         default:
@@ -311,6 +312,12 @@ static uint16_t c_cced_timer = 0;
 static bool c_cced_held = false;
 static bool c_cced_fired = false;  // Track if hold action already fired
 static bool c_cced_interrupted = false;  // Track if another key was pressed
+
+// State for BS_DEL_SYM (tap=backspace/delete, hold=sym layer)
+static uint16_t bs_del_timer = 0;
+static bool bs_del_held = false;
+static bool bs_del_fired = false;  // Track if hold action (layer) already fired
+static bool bs_del_interrupted = false;  // Track if another key was pressed
 
 // Helper for shift-aware accented characters (uses CapsLock for uppercase on Mac)
 static void send_accented_char(uint16_t dead_key, uint16_t letter) {
@@ -429,6 +436,35 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case MC_CCED:
             if (record->event.pressed) send_accented_char(0, FR_LCCE);
             return false;
+        case BS_DEL_SYM:
+            // Mod-morph layer-tap: tap=backspace (rshift+tap=delete), hold=sym layer
+            if (record->event.pressed) {
+                bs_del_timer = timer_read();
+                bs_del_held = true;
+                bs_del_fired = false;
+                bs_del_interrupted = false;
+            } else {
+                if (bs_del_fired || bs_del_interrupted) {
+                    // Was held long enough or interrupted, deactivate layer
+                    layer_off(LAYER_SYM);
+                } else {
+                    // Tap: check for right shift modifier
+                    uint8_t mods = get_mods() | get_oneshot_mods();
+                    if (mods & MOD_BIT(KC_RSFT)) {
+                        // Clear right shift, send delete, restore mods
+                        del_mods(MOD_BIT(KC_RSFT));
+                        del_oneshot_mods(MOD_BIT(KC_RSFT));
+                        tap_code(KC_DEL);
+                        set_mods(mods);
+                    } else {
+                        tap_code(KC_BSPC);
+                    }
+                }
+                bs_del_held = false;
+                bs_del_fired = false;
+                bs_del_interrupted = false;
+            }
+            return false;
         case C_CCED_HT:
             // Hold-tap: tap=c, hold=ç/Ç (shift-aware, fires on timer or interrupt)
             if (record->event.pressed) {
@@ -447,22 +483,33 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             return false;
         default:
-            // HOLD_ON_OTHER_KEY_PRESS behavior for C_CCED_HT:
-            // If C is held and another key is pressed, immediately send 'c'
-            if (c_cced_held && !c_cced_fired && !c_cced_interrupted && record->event.pressed) {
-                tap_code(FR_C);
-                c_cced_interrupted = true;
+            // HOLD_ON_OTHER_KEY_PRESS behavior for custom hold-taps
+            if (record->event.pressed) {
+                // BS_DEL_SYM: immediately activate layer when another key is pressed
+                if (bs_del_held && !bs_del_fired && !bs_del_interrupted) {
+                    layer_on(LAYER_SYM);
+                    bs_del_interrupted = true;
+                }
+                // C_CCED_HT: immediately send 'c' when another key is pressed
+                if (c_cced_held && !c_cced_fired && !c_cced_interrupted) {
+                    tap_code(FR_C);
+                    c_cced_interrupted = true;
+                }
             }
             return true;
     }
     return true;
 }
 
-// Check C_CCED_HT timer and fire hold action immediately when reached
+// Check timers and fire hold actions immediately when reached
 void matrix_scan_user(void) {
     if (c_cced_held && !c_cced_fired && timer_elapsed(c_cced_timer) >= TAPPING_TERM) {
         send_accented_char(0, FR_LCCE);
         c_cced_fired = true;
+    }
+    if (bs_del_held && !bs_del_fired && timer_elapsed(bs_del_timer) >= TAPPING_TERM) {
+        layer_on(LAYER_SYM);
+        bs_del_fired = true;
     }
 }
 
