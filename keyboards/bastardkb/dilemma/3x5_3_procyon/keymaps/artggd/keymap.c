@@ -286,6 +286,21 @@ uint16_t get_flow_tap_term(uint16_t keycode, keyrecord_t *record, uint16_t flow_
     }
 }
 
+uint16_t get_quick_tap_term(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        // Diacritics layer-taps - disable auto-repeat so tap-then-hold works
+        case LT(LAYER_DIAC_RCIRC, FR_W):   // W_RCIRC
+        case LT(LAYER_DIAC_ACUTE, FR_F):   // F_ACUTE
+        case LT(LAYER_DIAC_RGRAVE, FR_P):  // P_RGRAV
+        case LT(LAYER_DIAC_TREMA, FR_G):   // G_TREMA
+        case LT(LAYER_DIAC_LGRAVE, FR_O):  // O_LGRAV
+        case LT(LAYER_DIAC_LCIRC, FR_Y):   // Y_LCIRC
+            return 0;  // Disable auto-repeat for diacritics
+        default:
+            return QUICK_TAP_TERM;  // Use default for others
+    }
+}
+
 // State for C_CCED_HT hold-tap (tap=c, hold=ç)
 static uint16_t c_cced_timer = 0;
 static bool c_cced_held = false;

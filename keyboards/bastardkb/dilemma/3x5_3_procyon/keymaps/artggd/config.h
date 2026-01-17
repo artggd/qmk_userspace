@@ -29,6 +29,7 @@
 #define FLOW_TAP_TERM 100
 #define FLOW_TAP_TERM_PER_KEY
 #define CHORDAL_HOLD
+#define QUICK_TAP_TERM_PER_KEY
 //#define SPECULATIVE_HOLD
 
 // Significantly reduce trackpad sensitivity (lower DPI = less sensitive)
