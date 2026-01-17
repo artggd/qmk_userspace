@@ -304,6 +304,7 @@ uint16_t get_quick_tap_term(uint16_t keycode, keyrecord_t *record) {
 static uint16_t c_cced_timer = 0;
 static bool c_cced_held = false;
 static bool c_cced_fired = false;  // Track if hold action already fired
+static bool c_cced_interrupted = false;  // Track if another key was pressed
 
 // Helper for shift-aware accented characters (uses CapsLock for uppercase on Mac)
 static void send_accented_char(uint16_t dead_key, uint16_t letter) {
@@ -423,20 +424,30 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             if (record->event.pressed) send_accented_char(0, FR_LCCE);
             return false;
         case C_CCED_HT:
-            // Hold-tap: tap=c, hold=ç/Ç (shift-aware, fires on timer)
+            // Hold-tap: tap=c, hold=ç/Ç (shift-aware, fires on timer or interrupt)
             if (record->event.pressed) {
                 c_cced_timer = timer_read();
                 c_cced_held = true;
                 c_cced_fired = false;
+                c_cced_interrupted = false;
             } else {
-                if (c_cced_held && !c_cced_fired) {
-                    // Released before timer: send c
+                if (c_cced_held && !c_cced_fired && !c_cced_interrupted) {
+                    // Released before timer and no interrupt: send c
                     tap_code(FR_C);
                 }
                 c_cced_held = false;
                 c_cced_fired = false;
+                c_cced_interrupted = false;
             }
             return false;
+        default:
+            // HOLD_ON_OTHER_KEY_PRESS behavior for C_CCED_HT:
+            // If C is held and another key is pressed, immediately send 'c'
+            if (c_cced_held && !c_cced_fired && !c_cced_interrupted && record->event.pressed) {
+                tap_code(FR_C);
+                c_cced_interrupted = true;
+            }
+            return true;
     }
     return true;
 }
