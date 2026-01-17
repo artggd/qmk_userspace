@@ -284,7 +284,17 @@ uint16_t get_quick_tap_term(uint16_t keycode, keyrecord_t *record) {
         case LT(LAYER_DIAC_TREMA, FR_G):   // G_TREMA
         case LT(LAYER_DIAC_LGRAVE, FR_O):  // O_LGRAV
         case LT(LAYER_DIAC_LCIRC, FR_Y):   // Y_LCIRC
-            return 0;  // Disable auto-repeat for diacritics
+        // Left hand HRMs
+        case LCTL_T(FR_A):
+        case LALT_T(FR_R):
+        case LGUI_T(FR_S):
+        case LSFT_T(FR_T):
+        // Right hand HRMs
+        case RSFT_T(FR_N):
+        case RGUI_T(FR_E):
+        case LALT_T(FR_I):
+        case RCTL_T(FR_U):
+            return 0;  // Disable auto-repeat for diacritics and HRMs
         default:
             return QUICK_TAP_TERM;  // Use default for others
     }
