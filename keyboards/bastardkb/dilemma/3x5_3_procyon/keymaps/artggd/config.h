@@ -24,7 +24,7 @@
 
 // Timeless Home Row Mods Configuration (urob-style)
 // https://github.com/urob/zmk-config#timeless-homerow-mods
-#define TAPPING_TERM 250
+#define TAPPING_TERM 175
 #define PERMISSIVE_HOLD
 #define FLOW_TAP_TERM 100
 #define FLOW_TAP_TERM_PER_KEY

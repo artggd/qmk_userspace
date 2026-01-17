@@ -120,9 +120,9 @@ const char chordal_hold_layout[MATRIX_ROWS][MATRIX_COLS] PROGMEM =
     );
 
 // clang-format off
-/** \brief COLEMAK-DH layout adapted from ZMK config (3 rows, 10 columns). */
+/** \brief Colemak layout adapted from ZMK config (3 rows, 10 columns). */
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-  /* BASE Layer - Colemak-DH with home row mods
+  /* BASE Layer - Colemak with home row mods
    * Thumb layout: BS, Tab/Nav, Esc/Shift | Enter/Fun, Space/Sym, Del/Num
    */
   [LAYER_BASE] = LAYOUT_split_3x5_3(
@@ -137,7 +137,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    * Right: Arrows, Home/End, PgUp/PgDn
    */
   [LAYER_NAV] = LAYOUT_split_3x5_3(
-    G(FR_Z),  G(FR_X), G(FR_C), G(FR_V), G(S(FR_Z)),   XXXXXXX, G(KC_LEFT), KC_UP,   G(KC_RGHT), KC_BRIU,
+    G(FR_Z),  G(FR_X), G(FR_C), G(FR_V), G(S(FR_Z)),   UG_NEXT, G(KC_LEFT), KC_UP,   G(KC_RGHT), KC_BRIU,
     KC_LCTL,  KC_LALT, KC_LGUI, KC_LSFT, G(KC_D),      KC_CAPS, KC_LEFT,    KC_DOWN, KC_RGHT,    KC_BRID,
     XXXXXXX,  KC_RALT, XXXXXXX, XXXXXXX, XXXXXXX,      XXXXXXX, KC_MPRV,    KC_VOLD, KC_VOLU,    KC_MNXT,
                        XXXXXXX, _______, XXXXXXX,      KC_MSTP, KC_MPLY, KC_MUTE
@@ -158,7 +158,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    */
   [LAYER_SYM] = LAYOUT_split_3x5_3(
     FR_TILD,            FR_PERC, FR_CIRC, FR_UNDS, MC_BRACK,   XXXXXXX, XXXXXXX,          XXXXXXX, XXXXXXX, XXXXXXX,
-    MT(MOD_LSFT,KC_DOT), FR_AT, FR_DLR,  FR_MINS, MC_PAREN,   XXXXXXX, MO(LAYER_SFT_SYM), KC_RGUI, KC_LALT, KC_RCTL,
+    MT(MOD_LSFT,KC_DOT), FR_AT, FR_DLR,  FR_MINS, MC_PAREN,    XXXXXXX, MO(LAYER_SFT_SYM), KC_RGUI, KC_LALT, KC_RCTL,
     FR_HASH,            FR_AMPR, FR_EURO, FR_EQL,  MC_CURLY,   XXXXXXX, XXXXXXX,          XXXXXXX, KC_RALT, XXXXXXX,
                         FR_LABK, MO(LAYER_NAV), FR_RABK,       _______, XXXXXXX,          XXXXXXX
   ),
