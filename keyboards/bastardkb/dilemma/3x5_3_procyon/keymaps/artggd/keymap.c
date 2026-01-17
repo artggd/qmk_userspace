@@ -167,10 +167,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    * F keys arranged: F7-F9/F12 (top), F4-F6/F11 (mid), F1-F3/F10 (bottom)
    */
   [LAYER_FUN] = LAYOUT_split_3x5_3(
-    XXXXXXX, KC_F7,   KC_F8,   KC_F9,   KC_F12,     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-    XXXXXXX, KC_F4,   KC_F5,   KC_F6,   KC_F11,     XXXXXXX, KC_RSFT, KC_RGUI, KC_LALT, KC_RCTL,
-    XXXXXXX, KC_F1,   KC_F2,   KC_F3,   KC_F10,     XXXXXXX, XXXXXXX, XXXXXXX, KC_RALT, XXXXXXX,
-                      XXXXXXX, XXXXXXX, G(S(KC_4)), _______, XXXXXXX, XXXXXXX
+    XXXXXXX, KC_F7,   KC_F8,   KC_F9,      KC_F12,     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+    XXXXXXX, KC_F4,   KC_F5,   KC_F6,      KC_F11,     XXXXXXX, KC_RSFT, KC_RGUI, KC_LALT, KC_RCTL,
+    XXXXXXX, KC_F1,   KC_F2,   KC_F3,      KC_F10,     XXXXXXX, XXXXXXX, XXXXXXX, KC_RALT, XXXXXXX,
+                      XXXXXXX, G(S(KC_5)), G(S(KC_4)), _______, XXXXXXX, XXXXXXX
   ),
 
   /* SFT_SYM Layer - Individual bracket keys (accessed from SYM layer)
