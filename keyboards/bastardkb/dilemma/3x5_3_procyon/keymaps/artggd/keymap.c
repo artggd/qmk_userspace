@@ -72,17 +72,17 @@ enum custom_keycodes {
     MC_UGRV,                // ù/Ù
     MC_CCED,                // ç/Ç (direct key)
     C_CCED_HT,              // tap=c, hold=ç/Ç (hold-tap)
-    BS_DEL_SYM,             // tap=backspace, rshift+tap=delete, hold=sym layer
 };
 
 // Automatically enable sniping-mode on the pointer layer.
 // #define DILEMMA_AUTO_SNIPING_ON_LAYER LAYER_POINTER
 
-// Layer-tap defines (ZMK thumb layout: ESC, Space/Nav, Tab/Shift | Enter/Fun, Backspace/Sym, Shift/Num)
-#define SPC_NAV LT(LAYER_NAV, KC_SPC)
-#define TAB_SFT MT(MOD_LSFT, KC_TAB)
+// Layer-tap defines (thumb layout: BS, Tab/Nav, Esc/Shift | Enter/Fun, Space/Sym, Del/Num)
+#define TAB_NAV LT(LAYER_NAV, KC_TAB)
+#define ESC_SFT MT(MOD_LSFT, KC_ESC)
 #define ENT_FUN LT(LAYER_FUN, KC_ENT)
-#define SFT_NUM LT(LAYER_NUM, KC_LSFT)
+#define SPC_SYM LT(LAYER_SYM, KC_SPC)
+#define DEL_NUM LT(LAYER_NUM, KC_DEL)
 #define PT_Z    LT(LAYER_POINTER, FR_Z)
 #define PT_COLN LT(LAYER_POINTER, FR_COLN)
 
@@ -123,13 +123,13 @@ const char chordal_hold_layout[MATRIX_ROWS][MATRIX_COLS] PROGMEM =
 /** \brief COLEMAK-DH layout adapted from ZMK config (3 rows, 10 columns). */
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   /* BASE Layer - Colemak-DH with home row mods
-   * ZMK thumb layout: ESC/Media, Space/Nav, Tab/Shift | Enter/Fun, Backspace/Sym, Shift/Num
+   * Thumb layout: BS, Tab/Nav, Esc/Shift | Enter/Fun, Space/Sym, Del/Num
    */
   [LAYER_BASE] = LAYOUT_split_3x5_3(
        FR_Q,         W_RCIRC,      F_ACUTE,      P_RGRAV,      G_TREMA,     FR_J,    FR_L,         O_LGRAV,      Y_LCIRC,      MC_SQTDQ,
        LCTL_T(FR_A), LALT_T(FR_R), LGUI_T(FR_S), LSFT_T(FR_T), FR_D,        FR_H,    RSFT_T(FR_N), RGUI_T(FR_E), LALT_T(FR_I), RCTL_T(FR_U),
        PT_Z,         RALT_T(FR_X), C_CCED_HT,    FR_V,         FR_B,        FR_K,    FR_M,         FR_COMM,      FR_SCLN,      PT_COLN,
-                                   KC_ESC,       SPC_NAV,      TAB_SFT,     ENT_FUN, BS_DEL_SYM,   SFT_NUM
+                                   KC_BSPC,      TAB_NAV,      ESC_SFT,     ENT_FUN, SPC_SYM,      DEL_NUM
   ),
 
   /* NAV Layer - Navigation and clipboard (from ZMK)
@@ -257,11 +257,11 @@ uint16_t get_flow_tap_term(uint16_t keycode, keyrecord_t *record, uint16_t flow_
         // AltGr on bottom row
         case RALT_T(FR_X):
         // Thumb keys
-        case LT(LAYER_NAV, KC_SPC):     // SPC_NAV
-        case LSFT_T(KC_TAB):            // TAB_SFT
+        case LT(LAYER_NAV, KC_TAB):     // TAB_NAV
+        case LSFT_T(KC_ESC):            // ESC_SFT
         case LT(LAYER_FUN, KC_ENT):     // ENT_FUN
-        case BS_DEL_SYM:                // BS_DEL_SYM
-        case LT(LAYER_NUM, KC_LSFT):    // SFT_NUM
+        case LT(LAYER_SYM, KC_SPC):     // SPC_SYM
+        case LT(LAYER_NUM, KC_DEL):     // DEL_NUM
         // Diacritics layer-taps
         case LT(LAYER_DIAC_RCIRC, FR_W):   // W_RCIRC
         case LT(LAYER_DIAC_ACUTE, FR_F):   // F_ACUTE
@@ -296,11 +296,11 @@ uint16_t get_quick_tap_term(uint16_t keycode, keyrecord_t *record) {
         case LALT_T(FR_I):
         case RCTL_T(FR_U):
         // Thumb keys - disable auto-repeat so tap-then-hold activates layer
-        case SPC_NAV:
-        case TAB_SFT:
+        case TAB_NAV:
+        case ESC_SFT:
         case ENT_FUN:
-        case BS_DEL_SYM:
-        case SFT_NUM:
+        case SPC_SYM:
+        case DEL_NUM:
             return 0;  // Disable auto-repeat for diacritics, HRMs, and thumb keys
         default:
             return QUICK_TAP_TERM;  // Use default for others
@@ -312,12 +312,6 @@ static uint16_t c_cced_timer = 0;
 static bool c_cced_held = false;
 static bool c_cced_fired = false;  // Track if hold action already fired
 static bool c_cced_interrupted = false;  // Track if another key was pressed
-
-// State for BS_DEL_SYM (tap=backspace/delete, hold=sym layer)
-static uint16_t bs_del_timer = 0;
-static bool bs_del_held = false;
-static bool bs_del_fired = false;  // Track if hold action (layer) already fired
-static bool bs_del_interrupted = false;  // Track if another key was pressed
 
 // Helper for shift-aware accented characters (uses CapsLock for uppercase on Mac)
 static void send_accented_char(uint16_t dead_key, uint16_t letter) {
@@ -436,35 +430,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case MC_CCED:
             if (record->event.pressed) send_accented_char(0, FR_LCCE);
             return false;
-        case BS_DEL_SYM:
-            // Mod-morph layer-tap: tap=backspace (rshift+tap=delete), hold=sym layer
-            if (record->event.pressed) {
-                bs_del_timer = timer_read();
-                bs_del_held = true;
-                bs_del_fired = false;
-                bs_del_interrupted = false;
-            } else {
-                if (bs_del_fired || bs_del_interrupted) {
-                    // Was held long enough or interrupted, deactivate layer
-                    layer_off(LAYER_SYM);
-                } else {
-                    // Tap: check for right shift modifier
-                    uint8_t mods = get_mods() | get_oneshot_mods();
-                    if (mods & MOD_BIT(KC_RSFT)) {
-                        // Clear right shift, send delete, restore mods
-                        del_mods(MOD_BIT(KC_RSFT));
-                        del_oneshot_mods(MOD_BIT(KC_RSFT));
-                        tap_code(KC_DEL);
-                        set_mods(mods);
-                    } else {
-                        tap_code(KC_BSPC);
-                    }
-                }
-                bs_del_held = false;
-                bs_del_fired = false;
-                bs_del_interrupted = false;
-            }
-            return false;
         case C_CCED_HT:
             // Hold-tap: tap=c, hold=ç/Ç (shift-aware, fires on timer or interrupt)
             if (record->event.pressed) {
@@ -485,11 +450,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         default:
             // HOLD_ON_OTHER_KEY_PRESS behavior for custom hold-taps
             if (record->event.pressed) {
-                // BS_DEL_SYM: immediately activate layer when another key is pressed
-                if (bs_del_held && !bs_del_fired && !bs_del_interrupted) {
-                    layer_on(LAYER_SYM);
-                    bs_del_interrupted = true;
-                }
                 // C_CCED_HT: immediately send 'c' when another key is pressed
                 if (c_cced_held && !c_cced_fired && !c_cced_interrupted) {
                     tap_code(FR_C);
@@ -506,10 +466,6 @@ void matrix_scan_user(void) {
     if (c_cced_held && !c_cced_fired && timer_elapsed(c_cced_timer) >= TAPPING_TERM) {
         send_accented_char(0, FR_LCCE);
         c_cced_fired = true;
-    }
-    if (bs_del_held && !bs_del_fired && timer_elapsed(bs_del_timer) >= TAPPING_TERM) {
-        layer_on(LAYER_SYM);
-        bs_del_fired = true;
     }
 }
 
