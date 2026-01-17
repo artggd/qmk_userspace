@@ -34,7 +34,6 @@
 enum dilemma_keymap_layers {
     LAYER_BASE = 0,
     LAYER_NAV,
-    LAYER_MEDIA,
     LAYER_NUM,
     LAYER_SYM,
     LAYER_FUN,
@@ -78,8 +77,7 @@ enum custom_keycodes {
 // Automatically enable sniping-mode on the pointer layer.
 // #define DILEMMA_AUTO_SNIPING_ON_LAYER LAYER_POINTER
 
-// Layer-tap defines (ZMK thumb layout: ESC/Media, Space/Nav, Tab/Shift | Enter/Fun, Backspace/Sym, Shift/Num)
-#define ESC_MED LT(LAYER_MEDIA, KC_ESC)
+// Layer-tap defines (ZMK thumb layout: ESC, Space/Nav, Tab/Shift | Enter/Fun, Backspace/Sym, Shift/Num)
 #define SPC_NAV LT(LAYER_NAV, KC_SPC)
 #define TAB_SFT MT(MOD_LSFT, KC_TAB)
 #define ENT_FUN LT(LAYER_FUN, KC_ENT)
@@ -130,7 +128,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
        FR_Q,         W_RCIRC,      F_ACUTE,      P_RGRAV,      G_TREMA,     FR_J,    FR_L,         O_LGRAV,      Y_LCIRC,      MC_SQTDQ,
        LCTL_T(FR_A), LALT_T(FR_R), LGUI_T(FR_S), LSFT_T(FR_T), FR_D,        FR_H,    RSFT_T(FR_N), RGUI_T(FR_E), LALT_T(FR_I), RCTL_T(FR_U),
        PT_Z,         RALT_T(FR_X), C_CCED_HT,    FR_V,         FR_B,        FR_K,    FR_M,         FR_COMM,      FR_SCLN,      PT_COLN,
-                                   ESC_MED,      SPC_NAV,      TAB_SFT,     ENT_FUN, BSP_SYM,      SFT_NUM
+                                   KC_ESC,       SPC_NAV,      TAB_SFT,     ENT_FUN, BSP_SYM,      SFT_NUM
   ),
 
   /* NAV Layer - Navigation and clipboard (from ZMK)
@@ -138,18 +136,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    * Right: Arrows, Home/End, PgUp/PgDn
    */
   [LAYER_NAV] = LAYOUT_split_3x5_3(
-    G(FR_Z),  G(FR_X), G(FR_C), G(FR_V), G(S(FR_Z)),   XXXXXXX, G(KC_LEFT), KC_UP, G(KC_RGHT), XXXXXXX,
-    KC_LCTL,  KC_LALT, KC_LGUI, KC_LSFT, G(KC_D),      KC_CAPS, KC_LEFT, KC_DOWN, KC_RGHT, KC_PGUP,
-    XXXXXXX,  KC_RALT, XXXXXXX, XXXXXXX, XXXXXXX,      XXXXXXX, XXXXXXX, KC_APP,  XXXXXXX, KC_PGDN,
-                       XXXXXXX, _______, XXXXXXX,      _______, _______, _______
-  ),
-
-  /* MEDIA Layer - Media controls and bootloader (from ZMK) */
-  [LAYER_MEDIA] = LAYOUT_split_3x5_3(
-    QK_BOOT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, QK_BOOT,
-    KC_LCTL, KC_LALT, KC_LGUI, KC_LSFT, XXXXXXX,    XXXXXXX, KC_MPRV, KC_VOLD, KC_VOLU, KC_MNXT,
-    XXXXXXX, KC_RALT, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX, KC_BRID, KC_BRIU, XXXXXXX,
-                      _______, XXXXXXX, XXXXXXX,    KC_MSTP, KC_MPLY, KC_MUTE
+    G(FR_Z),  G(FR_X), G(FR_C), G(FR_V), G(S(FR_Z)),   XXXXXXX, G(KC_LEFT), KC_UP,   G(KC_RGHT), KC_BRIU,
+    KC_LCTL,  KC_LALT, KC_LGUI, KC_LSFT, G(KC_D),      KC_CAPS, KC_LEFT,    KC_DOWN, KC_RGHT,    KC_BRID,
+    XXXXXXX,  KC_RALT, XXXXXXX, XXXXXXX, XXXXXXX,      XXXXXXX, KC_MPRV,    KC_VOLD, KC_VOLU,    KC_MNXT,
+                       XXXXXXX, _______, XXXXXXX,      KC_MSTP, KC_MPLY, KC_MUTE
   ),
 
   /* NUM Layer - Numpad layout (from ZMK)
@@ -266,7 +256,6 @@ uint16_t get_flow_tap_term(uint16_t keycode, keyrecord_t *record, uint16_t flow_
         // AltGr on bottom row
         case RALT_T(FR_X):
         // Thumb keys
-        case LT(LAYER_MEDIA, KC_ESC):   // ESC_MED
         case LT(LAYER_NAV, KC_SPC):     // SPC_NAV
         case LSFT_T(KC_TAB):            // TAB_SFT
         case LT(LAYER_FUN, KC_ENT):     // ENT_FUN
@@ -470,7 +459,6 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
     [LAYER_BASE]       = {ENCODER_CCW_CW(MS_WHLD, MS_WHLU), ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
     [LAYER_NAV]        = {ENCODER_CCW_CW(KC_PGDN, KC_PGUP), ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
-    [LAYER_MEDIA]      = {ENCODER_CCW_CW(KC_PGDN, KC_PGUP), ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
     [LAYER_NUM]        = {ENCODER_CCW_CW(RM_VALD, RM_VALU), ENCODER_CCW_CW(RM_SPDD, RM_SPDU)},
     [LAYER_SYM]        = {ENCODER_CCW_CW(RM_PREV, RM_NEXT), ENCODER_CCW_CW(KC_LEFT, KC_RGHT)},
     [LAYER_FUN]        = {ENCODER_CCW_CW(KC_DOWN, KC_UP),   ENCODER_CCW_CW(KC_LEFT, KC_RGHT)},
