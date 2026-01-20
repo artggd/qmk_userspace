@@ -140,7 +140,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     G(FR_Z),  G(FR_X), G(FR_C), G(FR_V), G(S(FR_Z)),   UG_NEXT, G(KC_LEFT), KC_UP,   G(KC_RGHT), KC_BRIU,
     KC_LCTL,  KC_LALT, KC_LGUI, KC_LSFT, G(KC_D),      KC_CAPS, KC_LEFT,    KC_DOWN, KC_RGHT,    KC_BRID,
     XXXXXXX,  KC_RALT, XXXXXXX, XXXXXXX, XXXXXXX,      XXXXXXX, KC_MPRV,    KC_VOLD, KC_VOLU,    KC_MNXT,
-                       XXXXXXX, _______, XXXXXXX,      KC_MSTP, KC_MPLY, KC_MUTE
+                       XXXXXXX, _______, XXXXXXX,      KC_ENT,  KC_MPLY, KC_MUTE
   ),
 
   /* NUM Layer - Numpad layout (from ZMK)
