@@ -77,9 +77,9 @@ enum custom_keycodes {
 // Automatically enable sniping-mode on the pointer layer.
 // #define DILEMMA_AUTO_SNIPING_ON_LAYER LAYER_POINTER
 
-// Layer-tap defines (thumb layout: BS, Tab/Nav, Esc/Shift | Enter/Fun, Space/Sym, Del/Num)
-#define TAB_NAV LT(LAYER_NAV, KC_TAB)
-#define ESC_SFT MT(MOD_LSFT, KC_ESC)
+// Layer-tap defines (thumb layout: Esc, BS/Nav, Tab/Shift | Enter/Fun, Space/Sym, Del/Num)
+#define BS_NAV  LT(LAYER_NAV, KC_BSPC)
+#define TAB_SFT MT(MOD_LSFT, KC_TAB)
 #define ENT_FUN LT(LAYER_FUN, KC_ENT)
 #define SPC_SYM LT(LAYER_SYM, KC_SPC)
 #define DEL_NUM LT(LAYER_NUM, KC_DEL)
@@ -123,13 +123,13 @@ const char chordal_hold_layout[MATRIX_ROWS][MATRIX_COLS] PROGMEM =
 /** \brief Colemak layout adapted from ZMK config (3 rows, 10 columns). */
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   /* BASE Layer - Colemak with home row mods
-   * Thumb layout: BS, Tab/Nav, Esc/Shift | Enter/Fun, Space/Sym, Del/Num
+   * Thumb layout: Esc, BS/Nav, Tab/Shift | Enter/Fun, Space/Sym, Del/Num
    */
   [LAYER_BASE] = LAYOUT_split_3x5_3(
        FR_Q,         W_RCIRC,      F_ACUTE,      P_RGRAV,      G_TREMA,     FR_J,    FR_L,         O_LGRAV,      Y_LCIRC,      MC_SQTDQ,
        LCTL_T(FR_A), LALT_T(FR_R), LGUI_T(FR_S), LSFT_T(FR_T), FR_D,        FR_H,    RSFT_T(FR_N), RGUI_T(FR_E), LALT_T(FR_I), RCTL_T(FR_U),
        PT_Z,         RALT_T(FR_X), C_CCED_HT,    FR_V,         FR_B,        FR_K,    FR_M,         FR_COMM,      FR_SCLN,      PT_COLN,
-                                   KC_BSPC,      TAB_NAV,      ESC_SFT,     ENT_FUN, SPC_SYM,      DEL_NUM
+                                   KC_ESC,       BS_NAV,       TAB_SFT,     ENT_FUN, SPC_SYM,      DEL_NUM
   ),
 
   /* NAV Layer - Navigation and clipboard (from ZMK)
@@ -257,8 +257,8 @@ uint16_t get_flow_tap_term(uint16_t keycode, keyrecord_t *record, uint16_t flow_
         // AltGr on bottom row
         case RALT_T(FR_X):
         // Thumb keys
-        case LT(LAYER_NAV, KC_TAB):     // TAB_NAV
-        case LSFT_T(KC_ESC):            // ESC_SFT
+        case LT(LAYER_NAV, KC_BSPC):    // BS_NAV
+        case MT(MOD_LSFT, KC_TAB):      // TAB_SFT
         case LT(LAYER_FUN, KC_ENT):     // ENT_FUN
         case LT(LAYER_SYM, KC_SPC):     // SPC_SYM
         case LT(LAYER_NUM, KC_DEL):     // DEL_NUM
@@ -296,8 +296,8 @@ uint16_t get_quick_tap_term(uint16_t keycode, keyrecord_t *record) {
         case LALT_T(FR_I):
         case RCTL_T(FR_U):
         // Thumb keys - disable auto-repeat so tap-then-hold activates layer
-        case TAB_NAV:
-        case ESC_SFT:
+        case BS_NAV:
+        case TAB_SFT:
         case ENT_FUN:
         case SPC_SYM:
         case DEL_NUM:

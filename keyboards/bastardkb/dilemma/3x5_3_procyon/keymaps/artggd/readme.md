@@ -16,7 +16,7 @@ A Colemak layout with home row mods, French AZERTY support, and extensive diacri
 | Layer | # | Activation | Purpose |
 |-------|---|------------|---------|
 | BASE | 0 | Default | Colemak with home row mods |
-| NAV | 1 | Hold Tab | Navigation, arrows, clipboard, media |
+| NAV | 1 | Hold Backspace | Navigation, arrows, clipboard, media |
 | NUM | 2 | Hold Del | Numpad with operators |
 | SYM | 3 | Hold Space | Symbols and auto-pair brackets |
 | FUN | 4 | Hold Enter | Function keys F1-F12 |
@@ -42,7 +42,7 @@ Home row mods: tap for letter, hold for modifier. Diacritics: hold W/F/P/G/O/Y f
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
 │  Z/Ptr│ X/RAlt│  C/ç  │   V   │   B   │   │   K   │   M   │   ,   │   ;   │ :/Ptr │
 ╰───────┴───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┴───────╯
-                │   ⌫   │ ↹/Nav │Esc/⇧  │   │ ↵/Fun │Spc/Sym│ ⌦/Num │
+                │  Esc  │ ⌫/Nav │ ↹/⇧   │   │ ↵/Fun │Spc/Sym│ ⌦/Num │
                 ╰───────┴───────┴───────╯   ╰───────┴───────┴───────╯
 ```
 
@@ -52,7 +52,7 @@ Home row mods: tap for letter, hold for modifier. Diacritics: hold W/F/P/G/O/Y f
 
 ## Layer 1: NAV (Navigation & Clipboard)
 
-Activation: Hold Tab
+Activation: Hold Backspace
 
 ```
 ╭───────┬───────┬───────┬───────┬───────╮   ╭───────┬───────┬───────┬───────┬───────╮
@@ -62,7 +62,7 @@ Activation: Hold Tab
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
 │xxxxxx │ RAlt  │xxxxxx │xxxxxx │xxxxxx │   │xxxxxx │  ⏮   │ Vol-  │ Vol+  │  ⏭   │
 ╰───────┴───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┴───────╯
-                │xxxxxx │  ▼▼▼  │xxxxxx │   │  ⏹   │  ⏯   │ Mute  │
+                │xxxxxx │  ▼▼▼  │xxxxxx │   │   ↵   │  ⏯   │ Mute  │
                 ╰───────┴───────┴───────╯   ╰───────┴───────┴───────╯
 ```
 
