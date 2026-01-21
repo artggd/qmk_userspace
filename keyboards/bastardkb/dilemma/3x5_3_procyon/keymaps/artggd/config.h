@@ -41,3 +41,6 @@
 
 // Combo settings (matching ZMK COMBO_TERM)
 #define COMBO_TERM 50
+
+// RGB timeout after 5 minutes of inactivity
+#define RGB_MATRIX_TIMEOUT 300000
