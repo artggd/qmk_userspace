@@ -26,6 +26,7 @@
 // https://github.com/urob/zmk-config#timeless-homerow-mods
 #define TAPPING_TERM 175
 #define PERMISSIVE_HOLD
+#define HOLD_ON_OTHER_KEY_PRESS_PER_KEY
 #define FLOW_TAP_TERM 100
 #define FLOW_TAP_TERM_PER_KEY
 #define CHORDAL_HOLD

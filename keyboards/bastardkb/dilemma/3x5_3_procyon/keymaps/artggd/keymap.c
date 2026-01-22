@@ -276,6 +276,15 @@ uint16_t get_flow_tap_term(uint16_t keycode, keyrecord_t *record, uint16_t flow_
     }
 }
 
+bool get_hold_on_other_key_press(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case SPC_SYM:
+            return true;  // Immediately select hold if another key is pressed
+        default:
+            return false;
+    }
+}
+
 uint16_t get_quick_tap_term(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         // Diacritics layer-taps - disable auto-repeat so tap-then-hold works
