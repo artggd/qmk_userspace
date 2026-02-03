@@ -73,6 +73,7 @@ enum custom_keycodes {
     MC_CCED,                // ç/Ç (direct key)
     C_CCED_HT,              // tap=c, hold=ç/Ç (hold-tap)
     HT_PASTE_F11,           // tap=Cmd+V, hold=F11
+    AP_GLOB,                // Apple Globe key (macOS)
 };
 
 // Automatically enable sniping-mode on the pointer layer.
@@ -140,7 +141,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [LAYER_NAV] = LAYOUT_split_3x5_3(
     G(FR_Z),  G(FR_X), G(FR_C), HT_PASTE_F11, G(S(FR_Z)),   UG_NEXT, G(KC_LEFT), KC_UP,   G(KC_RGHT), KC_BRIU,
     KC_LCTL,  KC_LALT, KC_LGUI, KC_LSFT, G(KC_D),      KC_CAPS, KC_LEFT,    KC_DOWN, KC_RGHT,    KC_BRID,
-    XXXXXXX,  KC_RALT, XXXXXXX, XXXXXXX, XXXXXXX,      XXXXXXX, KC_MPRV,    KC_VOLD, KC_VOLU,    KC_MNXT,
+    XXXXXXX,  KC_RALT, XXXXXXX, AP_GLOB, XXXXXXX,      XXXXXXX, KC_MPRV,    KC_VOLD, KC_VOLU,    KC_MNXT,
                        XXXXXXX, _______, XXXXXXX,      KC_ENT,  KC_MPLY, KC_MUTE
   ),
 
@@ -472,6 +473,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 c_cced_fired = false;
                 c_cced_interrupted = false;
             }
+            return false;
+        case AP_GLOB:
+            // Apple Globe key - USB Consumer Usage ID 0x029D
+            host_consumer_send(record->event.pressed ? 0x029D : 0);
             return false;
         case HT_PASTE_F11:
             // Hold-tap: tap=Cmd+V, hold=F11 (real key hold/release)

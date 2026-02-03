@@ -60,7 +60,7 @@ Activation: Hold Backspace
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
 │  ⌃    │  ⌥    │  ⌘    │  ⇧    │ ⌘+D   │   │ Caps  │   ←   │   ↓   │   →   │Bright↓│
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
-│xxxxxx │ RAlt  │xxxxxx │xxxxxx │xxxxxx │   │xxxxxx │  ⏮   │ Vol-  │ Vol+  │  ⏭   │
+│xxxxxx │ RAlt  │xxxxxx │  🌐   │xxxxxx │   │xxxxxx │  ⏮   │ Vol-  │ Vol+  │  ⏭   │
 ╰───────┴───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┴───────╯
                 │xxxxxx │  ▼▼▼  │xxxxxx │   │   ↵   │  ⏯   │ Mute  │
                 ╰───────┴───────┴───────╯   ╰───────┴───────┴───────╯
@@ -301,6 +301,13 @@ For individual brackets without auto-pairing, hold SftSym to access layer 5.
 All accented characters support uppercase via CapsLock:
 - Normal tap = lowercase (é, è, ê, etc.)
 - With Shift held = uppercase (É, È, Ê, etc.)
+
+### macOS Globe Key
+
+The NAV layer includes the macOS Globe key (at V position):
+- Opens emoji picker (Globe alone or Globe+E)
+- Triggers dictation (Globe+D)
+- Access special function key behaviors
 
 ### Trackpad Features
 
