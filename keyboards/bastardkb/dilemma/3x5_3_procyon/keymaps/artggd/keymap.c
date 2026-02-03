@@ -72,6 +72,7 @@ enum custom_keycodes {
     MC_UGRV,                // ù/Ù
     MC_CCED,                // ç/Ç (direct key)
     C_CCED_HT,              // tap=c, hold=ç/Ç (hold-tap)
+    HT_PASTE_F11,           // tap=Cmd+V, hold=F11
 };
 
 // Automatically enable sniping-mode on the pointer layer.
@@ -137,7 +138,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    * Right: Arrows, Home/End, PgUp/PgDn
    */
   [LAYER_NAV] = LAYOUT_split_3x5_3(
-    G(FR_Z),  G(FR_X), G(FR_C), G(FR_V), G(S(FR_Z)),   UG_NEXT, G(KC_LEFT), KC_UP,   G(KC_RGHT), KC_BRIU,
+    G(FR_Z),  G(FR_X), G(FR_C), HT_PASTE_F11, G(S(FR_Z)),   UG_NEXT, G(KC_LEFT), KC_UP,   G(KC_RGHT), KC_BRIU,
     KC_LCTL,  KC_LALT, KC_LGUI, KC_LSFT, G(KC_D),      KC_CAPS, KC_LEFT,    KC_DOWN, KC_RGHT,    KC_BRID,
     XXXXXXX,  KC_RALT, XXXXXXX, XXXXXXX, XXXXXXX,      XXXXXXX, KC_MPRV,    KC_VOLD, KC_VOLU,    KC_MNXT,
                        XXXXXXX, _______, XXXXXXX,      KC_ENT,  KC_MPLY, KC_MUTE
@@ -322,6 +323,12 @@ static bool c_cced_held = false;
 static bool c_cced_fired = false;  // Track if hold action already fired
 static bool c_cced_interrupted = false;  // Track if another key was pressed
 
+// State for HT_PASTE_F11 hold-tap (tap=Cmd+V, hold=F11)
+static uint16_t paste_f11_timer = 0;
+static bool paste_f11_held = false;
+static bool paste_f11_fired = false;
+static bool paste_f11_interrupted = false;
+
 // Helper for shift-aware accented characters (uses CapsLock for uppercase on Mac)
 static void send_accented_char(uint16_t dead_key, uint16_t letter) {
     uint8_t mods = get_mods() | get_oneshot_mods();
@@ -466,6 +473,26 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 c_cced_interrupted = false;
             }
             return false;
+        case HT_PASTE_F11:
+            // Hold-tap: tap=Cmd+V, hold=F11 (real key hold/release)
+            if (record->event.pressed) {
+                paste_f11_timer = timer_read();
+                paste_f11_held = true;
+                paste_f11_fired = false;
+                paste_f11_interrupted = false;
+            } else {
+                if (paste_f11_held && !paste_f11_fired && !paste_f11_interrupted) {
+                    // Released before timer and no interrupt: send Cmd+V
+                    tap_code16(G(FR_V));
+                } else if (paste_f11_fired) {
+                    // Release F11 when key is released
+                    unregister_code(KC_F11);
+                }
+                paste_f11_held = false;
+                paste_f11_fired = false;
+                paste_f11_interrupted = false;
+            }
+            return false;
         default:
             // HOLD_ON_OTHER_KEY_PRESS behavior for custom hold-taps
             if (record->event.pressed) {
@@ -473,6 +500,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 if (c_cced_held && !c_cced_fired && !c_cced_interrupted) {
                     tap_code(FR_C);
                     c_cced_interrupted = true;
+                }
+                // HT_PASTE_F11: immediately send Cmd+V when another key is pressed
+                if (paste_f11_held && !paste_f11_fired && !paste_f11_interrupted) {
+                    tap_code16(G(FR_V));
+                    paste_f11_interrupted = true;
                 }
             }
             return true;
@@ -485,6 +517,10 @@ void matrix_scan_user(void) {
     if (c_cced_held && !c_cced_fired && timer_elapsed(c_cced_timer) >= TAPPING_TERM) {
         send_accented_char(0, FR_LCCE);
         c_cced_fired = true;
+    }
+    if (paste_f11_held && !paste_f11_fired && timer_elapsed(paste_f11_timer) >= TAPPING_TERM) {
+        register_code(KC_F11);  // Press and hold F11
+        paste_f11_fired = true;
     }
 }
 
