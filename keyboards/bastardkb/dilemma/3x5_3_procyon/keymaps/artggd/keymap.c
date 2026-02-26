@@ -141,7 +141,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [LAYER_NAV] = LAYOUT_split_3x5_3(
     G(FR_Z),  G(FR_X), G(FR_C), HT_PASTE_F11, G(S(FR_Z)),   UG_NEXT, G(KC_LEFT), KC_UP,   G(KC_RGHT), KC_BRIU,
     KC_LCTL,  KC_LALT, KC_LGUI, KC_LSFT, G(KC_D),      KC_CAPS, KC_LEFT,    KC_DOWN, KC_RGHT,    KC_BRID,
-    XXXXXXX,  KC_RALT, XXXXXXX, AP_GLOB, XXXXXXX,      XXXXXXX, KC_MPRV,    KC_VOLD, KC_VOLU,    KC_MNXT,
+    KC_PWR,   KC_RALT, XXXXXXX, AP_GLOB, XXXXXXX,      XXXXXXX, KC_MPRV,    KC_VOLD, KC_VOLU,    KC_MNXT,
                        XXXXXXX, _______, XXXXXXX,      KC_ENT,  KC_MPLY, KC_MUTE
   ),
 
@@ -323,6 +323,7 @@ static uint16_t c_cced_timer = 0;
 static bool c_cced_held = false;
 static bool c_cced_fired = false;  // Track if hold action already fired
 static bool c_cced_interrupted = false;  // Track if another key was pressed
+static uint8_t c_cced_mods = 0;   // Mods captured at C_CCED_HT press time
 
 // State for HT_PASTE_F11 hold-tap (tap=Cmd+V, hold=F11)
 static uint16_t paste_f11_timer = 0;
@@ -350,6 +351,22 @@ static void send_accented_char(uint16_t dead_key, uint16_t letter) {
 
 // Auto-pair bracket macros (Mac AZERTY key sequences)
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    // HOLD_ON_OTHER_KEY_PRESS behavior for custom hold-taps
+    // Must run BEFORE the switch so keycodes with their own case (e.g. MC_SQTDQ) also trigger interrupts
+    if (record->event.pressed && keycode != C_CCED_HT && keycode != HT_PASTE_F11) {
+        if (c_cced_held && !c_cced_fired && !c_cced_interrupted) {
+            uint8_t current_mods = get_mods();
+            set_mods(c_cced_mods);
+            tap_code(FR_C);
+            set_mods(current_mods & ~(c_cced_mods & MOD_MASK_SHIFT));
+            c_cced_interrupted = true;
+        }
+        if (paste_f11_held && !paste_f11_fired && !paste_f11_interrupted) {
+            tap_code16(G(FR_V));
+            paste_f11_interrupted = true;
+        }
+    }
+
     switch (keycode) {
         case MC_PAREN:
             if (record->event.pressed) {
@@ -464,10 +481,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 c_cced_held = true;
                 c_cced_fired = false;
                 c_cced_interrupted = false;
+                c_cced_mods = get_mods() | get_oneshot_mods();
             } else {
                 if (c_cced_held && !c_cced_fired && !c_cced_interrupted) {
-                    // Released before timer and no interrupt: send c
+                    // Released before timer and no interrupt: send c with captured mods
+                    uint8_t current_mods = get_mods();
+                    set_mods(c_cced_mods);
                     tap_code(FR_C);
+                    set_mods(current_mods);
                 }
                 c_cced_held = false;
                 c_cced_fired = false;
@@ -499,19 +520,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             return false;
         default:
-            // HOLD_ON_OTHER_KEY_PRESS behavior for custom hold-taps
-            if (record->event.pressed) {
-                // C_CCED_HT: immediately send 'c' when another key is pressed
-                if (c_cced_held && !c_cced_fired && !c_cced_interrupted) {
-                    tap_code(FR_C);
-                    c_cced_interrupted = true;
-                }
-                // HT_PASTE_F11: immediately send Cmd+V when another key is pressed
-                if (paste_f11_held && !paste_f11_fired && !paste_f11_interrupted) {
-                    tap_code16(G(FR_V));
-                    paste_f11_interrupted = true;
-                }
-            }
             return true;
     }
     return true;
