@@ -545,9 +545,34 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 }
 #    endif // DILEMMA_AUTO_SNIPING_ON_LAYER
 
+static mouse_xy_report_t apply_accel_axis(mouse_xy_report_t value, uint16_t multiplier) {
+    int32_t result = ((int32_t)value * multiplier) >> 8;
+    if (result > MOUSE_REPORT_XY_MAX) result = MOUSE_REPORT_XY_MAX;
+    if (result < MOUSE_REPORT_XY_MIN) result = MOUSE_REPORT_XY_MIN;
+    return (mouse_xy_report_t)result;
+}
+
+static uint16_t get_accel_multiplier(mouse_xy_report_t x, mouse_xy_report_t y) {
+    uint16_t speed = abs(x) + abs(y);
+    if (speed >= ACCEL_THRESHOLD_3) return ACCEL_MULTIPLIER_3;
+    if (speed >= ACCEL_THRESHOLD_2) return ACCEL_MULTIPLIER_2;
+    if (speed >= ACCEL_THRESHOLD_1) return ACCEL_MULTIPLIER_1;
+    return ACCEL_MULTIPLIER_0;
+}
+
 report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
     // Invert scroll direction (natural scrolling)
     mouse_report.v = -mouse_report.v;
+
+    // Apply acceleration to cursor movement (skip during sniping/drag-scroll)
+    if (!dilemma_get_pointer_sniping_enabled() && !dilemma_get_pointer_dragscroll_enabled()) {
+        if (mouse_report.x != 0 || mouse_report.y != 0) {
+            uint16_t multiplier = get_accel_multiplier(mouse_report.x, mouse_report.y);
+            mouse_report.x = apply_accel_axis(mouse_report.x, multiplier);
+            mouse_report.y = apply_accel_axis(mouse_report.y, multiplier);
+        }
+    }
+
     return mouse_report;
 }
 #endif     // POINTING_DEVICE_ENABLE

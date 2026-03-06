@@ -40,6 +40,15 @@
 // Invert scroll direction (natural scrolling)
 #define DILEMMA_DRAGSCROLL_REVERSE_Y
 
+// Mouse acceleration (8.8 fixed-point: 256 = 1.0x, 512 = 2.0x)
+#define ACCEL_THRESHOLD_1  3    // Below: no acceleration
+#define ACCEL_THRESHOLD_2  7    // Moderate acceleration
+#define ACCEL_THRESHOLD_3  15   // High acceleration; above: max
+#define ACCEL_MULTIPLIER_0 256  // 1.0x - precise movements
+#define ACCEL_MULTIPLIER_1 384  // 1.5x - moderate
+#define ACCEL_MULTIPLIER_2 640  // 2.5x - fast
+#define ACCEL_MULTIPLIER_3 1024 // 4.0x - flick
+
 // Combo settings (matching ZMK COMBO_TERM)
 #define COMBO_TERM 50
 
