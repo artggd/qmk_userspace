@@ -244,7 +244,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 // clang-format on
 
 // Disable Flow Tap for home row mods so they work after thumb keys
-uint16_t get_flow_tap_term(uint16_t keycode, keyrecord_t *record, uint16_t flow_tap_term) {
+uint16_t get_flow_tap_term(uint16_t keycode, keyrecord_t *record, uint16_t prev_keycode) {
     switch (keycode) {
         // Left hand HRMs
         case LCTL_T(FR_A):
@@ -274,7 +274,7 @@ uint16_t get_flow_tap_term(uint16_t keycode, keyrecord_t *record, uint16_t flow_
         case C_CCED_HT:                    // C with ç hold-tap
             return 0;  // Disable Flow Tap for HRMs, thumb keys, and diacritics
         default:
-            return flow_tap_term;  // Use default for other keys
+            return FLOW_TAP_TERM;  // Use default for other keys
     }
 }
 
@@ -284,6 +284,17 @@ bool get_hold_on_other_key_press(uint16_t keycode, keyrecord_t *record) {
             return true;  // Immediately select hold if another key is pressed
         default:
             return false;
+    }
+}
+
+// Shorter tapping term for shift so hold activates before key release
+uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case LSFT_T(FR_T):
+        case RSFT_T(FR_N):
+            return 130;
+        default:
+            return TAPPING_TERM;
     }
 }
 
