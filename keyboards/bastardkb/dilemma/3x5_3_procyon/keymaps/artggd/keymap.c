@@ -76,9 +76,6 @@ enum custom_keycodes {
     AP_GLOB,                // Apple Globe key (macOS)
 };
 
-// Automatically enable sniping-mode on the pointer layer.
-// #define DILEMMA_AUTO_SNIPING_ON_LAYER LAYER_POINTER
-
 // Layer-tap defines (thumb layout: Esc, BS/Nav, Tab/Shift | Enter/Fun, Space/Sym, Del/Num)
 #define BS_NAV  LT(LAYER_NAV, KC_BSPC)
 #define TAB_SFT MT(MOD_LSFT, KC_TAB)
@@ -95,14 +92,6 @@ enum custom_keycodes {
 #define G_TREMA LT(LAYER_DIAC_TREMA, FR_G)   // Hold G → trema layer (ë, ï, ü, ÿ)
 #define O_LGRAV LT(LAYER_DIAC_LGRAVE, FR_O)  // Hold O → grave layer (left: à)
 #define Y_LCIRC LT(LAYER_DIAC_LCIRC, FR_Y)   // Hold Y → circumflex layer (left: â)
-
-// Combos
-// O + Y -> !
-const uint16_t PROGMEM combo_exlm[] = {O_LGRAV, Y_LCIRC, COMBO_END};
-combo_t key_combos[] = {
-    COMBO(combo_exlm, FR_EXLM),
-};
-
 
 #ifndef POINTING_DEVICE_ENABLE
 #    define DRGSCRL KC_NO
@@ -243,89 +232,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 // clang-format on
 
-// Disable Flow Tap for home row mods so they work after thumb keys
-uint16_t get_flow_tap_term(uint16_t keycode, keyrecord_t *record, uint16_t prev_keycode) {
-    switch (keycode) {
-        // Left hand HRMs
-        case LCTL_T(FR_A):
-        case LALT_T(FR_R):
-        case LGUI_T(FR_S):
-        case LSFT_T(FR_T):
-        // Right hand HRMs
-        case RSFT_T(FR_N):
-        case RGUI_T(FR_E):
-        case LALT_T(FR_I):
-        case RCTL_T(FR_U):
-        // AltGr on bottom row
-        case RALT_T(FR_X):
-        // Thumb keys
-        case LT(LAYER_NAV, KC_BSPC):    // BS_NAV
-        case MT(MOD_LSFT, KC_TAB):      // TAB_SFT
-        case LT(LAYER_FUN, KC_ENT):     // ENT_FUN
-        case LT(LAYER_SYM, KC_SPC):     // SPC_SYM
-        case LT(LAYER_NUM, KC_DEL):     // DEL_NUM
-        // Diacritics layer-taps
-        case LT(LAYER_DIAC_RCIRC, FR_W):   // W_RCIRC
-        case LT(LAYER_DIAC_ACUTE, FR_F):   // F_ACUTE
-        case LT(LAYER_DIAC_RGRAVE, FR_P):  // P_RGRAV
-        case LT(LAYER_DIAC_TREMA, FR_G):   // G_TREMA
-        case LT(LAYER_DIAC_LGRAVE, FR_O):  // O_LGRAV
-        case LT(LAYER_DIAC_LCIRC, FR_Y):   // Y_LCIRC
-        case C_CCED_HT:                    // C with ç hold-tap
-            return 0;  // Disable Flow Tap for HRMs, thumb keys, and diacritics
-        default:
-            return FLOW_TAP_TERM;  // Use default for other keys
-    }
-}
-
 bool get_hold_on_other_key_press(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case SPC_SYM:
             return true;  // Immediately select hold if another key is pressed
         default:
             return false;
-    }
-}
-
-// Shorter tapping term for shift so hold activates before key release
-uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
-    switch (keycode) {
-        case LSFT_T(FR_T):
-        case RSFT_T(FR_N):
-            return 130;
-        default:
-            return TAPPING_TERM;
-    }
-}
-
-uint16_t get_quick_tap_term(uint16_t keycode, keyrecord_t *record) {
-    switch (keycode) {
-        // Diacritics layer-taps - disable auto-repeat so tap-then-hold works
-        case LT(LAYER_DIAC_RCIRC, FR_W):   // W_RCIRC
-        case LT(LAYER_DIAC_ACUTE, FR_F):   // F_ACUTE
-        case LT(LAYER_DIAC_RGRAVE, FR_P):  // P_RGRAV
-        case LT(LAYER_DIAC_TREMA, FR_G):   // G_TREMA
-        case LT(LAYER_DIAC_LGRAVE, FR_O):  // O_LGRAV
-        case LT(LAYER_DIAC_LCIRC, FR_Y):   // Y_LCIRC
-        // Left hand HRMs
-        case LCTL_T(FR_A):
-        case LALT_T(FR_R):
-        case LGUI_T(FR_S):
-        case LSFT_T(FR_T):
-        // Right hand HRMs
-        case RSFT_T(FR_N):
-        case RGUI_T(FR_E):
-        case LALT_T(FR_I):
-        case RCTL_T(FR_U):
-        // Thumb keys - disable auto-repeat so tap-then-hold activates layer
-        case BS_NAV:
-        case TAB_SFT:
-        case ENT_FUN:
-        case SPC_SYM:
-        case DEL_NUM:
-            return 0;  // Disable auto-repeat for diacritics, HRMs, and thumb keys
-        default:
-            return QUICK_TAP_TERM;  // Use default for others
     }
 }
 
@@ -547,46 +459,6 @@ void matrix_scan_user(void) {
         paste_f11_fired = true;
     }
 }
-
-#ifdef POINTING_DEVICE_ENABLE
-#    ifdef DILEMMA_AUTO_SNIPING_ON_LAYER
-layer_state_t layer_state_set_user(layer_state_t state) {
-    dilemma_set_pointer_sniping_enabled(layer_state_cmp(state, DILEMMA_AUTO_SNIPING_ON_LAYER));
-    return state;
-}
-#    endif // DILEMMA_AUTO_SNIPING_ON_LAYER
-
-static mouse_xy_report_t apply_accel_axis(mouse_xy_report_t value, uint16_t multiplier) {
-    int32_t result = ((int32_t)value * multiplier) >> 8;
-    if (result > MOUSE_REPORT_XY_MAX) result = MOUSE_REPORT_XY_MAX;
-    if (result < MOUSE_REPORT_XY_MIN) result = MOUSE_REPORT_XY_MIN;
-    return (mouse_xy_report_t)result;
-}
-
-static uint16_t get_accel_multiplier(mouse_xy_report_t x, mouse_xy_report_t y) {
-    uint16_t speed = abs(x) + abs(y);
-    if (speed >= ACCEL_THRESHOLD_3) return ACCEL_MULTIPLIER_3;
-    if (speed >= ACCEL_THRESHOLD_2) return ACCEL_MULTIPLIER_2;
-    if (speed >= ACCEL_THRESHOLD_1) return ACCEL_MULTIPLIER_1;
-    return ACCEL_MULTIPLIER_0;
-}
-
-report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
-    // Invert scroll direction (natural scrolling)
-    mouse_report.v = -mouse_report.v;
-
-    // Apply acceleration to cursor movement (skip during sniping/drag-scroll)
-    if (!dilemma_get_pointer_sniping_enabled() && !dilemma_get_pointer_dragscroll_enabled()) {
-        if (mouse_report.x != 0 || mouse_report.y != 0) {
-            uint16_t multiplier = get_accel_multiplier(mouse_report.x, mouse_report.y);
-            mouse_report.x = apply_accel_axis(mouse_report.x, multiplier);
-            mouse_report.y = apply_accel_axis(mouse_report.y, multiplier);
-        }
-    }
-
-    return mouse_report;
-}
-#endif     // POINTING_DEVICE_ENABLE
 
 #ifdef ENCODER_MAP_ENABLE
 // clang-format off

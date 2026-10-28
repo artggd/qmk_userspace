@@ -46,7 +46,7 @@ Home row mods: tap for letter, hold for modifier. Diacritics: hold W/F/P/G/O/Y f
                 ╰───────┴───────┴───────╯   ╰───────┴───────┴───────╯
 ```
 
-**Combo:** O + Y = !
+**Combo:** O + Y = ! (set up in the Argos app; combos are no longer defined in the keymap)
 
 ---
 
@@ -313,9 +313,16 @@ The NAV layer includes the macOS Globe key (at V position):
 
 - **Sniping mode**: Precision pointing for fine control
 - **Drag-scroll**: Move trackpad to scroll instead of move cursor
-- **Natural scrolling**: Scroll direction is inverted for natural feel
 
 ## Customizing
+
+### Argos
+
+This keymap uses BastardKB's `argos` and `bk_pointing_device` community modules
+(`modules/bastardkb` submodule). Tapping, quick-tap, flow-tap and combo terms,
+combos, tap dances, RGB and trackpad settings (DPI, invert, scroll direction)
+are configured in the Argos app and stored in EEPROM. The values in `config.h`
+are only used as initial values after an EEPROM reset.
 
 ### DPI Settings
 

@@ -28,30 +28,28 @@
 #define TAPPING_TERM_PER_KEY
 #define PERMISSIVE_HOLD
 #define HOLD_ON_OTHER_KEY_PRESS_PER_KEY
+// Argos defines its own FLOW_TAP_TERM (150)
+#undef FLOW_TAP_TERM
 #define FLOW_TAP_TERM 100
 #define FLOW_TAP_TERM_PER_KEY
 #define CHORDAL_HOLD
 #define QUICK_TAP_TERM_PER_KEY
+// No auto-repeat on tap-hold keys (was per-key before Argos)
+#define QUICK_TAP_TERM 0
 //#define SPECULATIVE_HOLD
-
-// Significantly reduce trackpad sensitivity (lower DPI = less sensitive)
-#define DILEMMA_MINIMUM_DEFAULT_DPI 90
-#define DILEMMA_DEFAULT_DPI_CONFIG_STEP 30
-
-// Invert scroll direction (natural scrolling)
-#define DILEMMA_DRAGSCROLL_REVERSE_Y
-
-// Mouse acceleration (8.8 fixed-point: 256 = 1.0x, 512 = 2.0x)
-#define ACCEL_THRESHOLD_1  3    // Below: no acceleration
-#define ACCEL_THRESHOLD_2  7    // Moderate acceleration
-#define ACCEL_THRESHOLD_3  15   // High acceleration; above: max
-#define ACCEL_MULTIPLIER_0 256  // 1.0x - precise movements
-#define ACCEL_MULTIPLIER_1 384  // 1.5x - moderate
-#define ACCEL_MULTIPLIER_2 640  // 2.5x - fast
-#define ACCEL_MULTIPLIER_3 1024 // 4.0x - flick
 
 // Combo settings (matching ZMK COMBO_TERM)
 #define COMBO_TERM 50
+
+// Argos and bk_pointing_device settings, from the BastardKB vendor keymap.
+// Argos only reads the timings above as initial values after an EEPROM reset;
+// afterwards they are configured in the Argos app.
+#undef AUTO_MOUSE_DEFAULT_LAYER
+#define AUTO_MOUSE_DEFAULT_LAYER 6 // LAYER_POINTER
+#undef LED_DPI_INDICATOR_INDEX
+#define LED_DPI_INDICATOR_INDEX 7
+#undef RGBLIGHT_LED_COUNT
+#define RGBLIGHT_LED_COUNT 72
 
 // RGB timeout after 5 minutes of inactivity
 #define RGB_MATRIX_TIMEOUT 300000
