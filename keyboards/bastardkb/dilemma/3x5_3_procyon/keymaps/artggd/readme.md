@@ -46,7 +46,7 @@ Home row mods: tap for letter, hold for modifier. Diacritics: hold W/F/P/G/O/Y f
                 ╰───────┴───────┴───────╯   ╰───────┴───────┴───────╯
 ```
 
-**Combo:** O + Y = ! (set up in the Argos app; combos are no longer defined in the keymap)
+**Combo:** O + Y = ! (defined in the keymap; Argos copies it into EEPROM after an EEPROM reset, then it can be edited in the Argos app)
 
 ---
 

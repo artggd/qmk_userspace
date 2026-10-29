@@ -93,6 +93,15 @@ enum custom_keycodes {
 #define O_LGRAV LT(LAYER_DIAC_LGRAVE, FR_O)  // Hold O → grave layer (left: à)
 #define Y_LCIRC LT(LAYER_DIAC_LCIRC, FR_Y)   // Hold Y → circumflex layer (left: â)
 
+// Combos
+// Argos copies these into EEPROM on its first boot (after an EEPROM reset);
+// the array must be sized ARGOS_COMBO_ENTRIES to match its introspection.h.
+// O + Y -> !
+const uint16_t PROGMEM combo_exlm[] = {O_LGRAV, Y_LCIRC, COMBO_END};
+combo_t key_combos[ARGOS_COMBO_ENTRIES] = {
+    COMBO(combo_exlm, FR_EXLM),
+};
+
 #ifndef POINTING_DEVICE_ENABLE
 #    define DRGSCRL KC_NO
 #    define DPI_MOD KC_NO
