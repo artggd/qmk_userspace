@@ -241,9 +241,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 // clang-format on
 
-// Flow Tap keys, as in QMK's default, minus the home row shifts so a quick
-// hold after a letter or space still gives shift. Argos owns get_flow_tap_term
-// but calls this for both the pressed and the previous key.
+// Flow Tap keys, as in QMK's default, minus the home row shifts and the
+// diacritics layer-taps so a quick hold after a letter or space still gives
+// shift / the accent. Argos owns get_flow_tap_term but calls this for both the
+// pressed and the previous key.
 bool is_flow_tap_key(uint16_t keycode) {
     if ((get_mods() & (MOD_MASK_CG | MOD_BIT_LALT)) != 0) {
         return false; // Disable Flow Tap on hotkeys.
@@ -251,6 +252,12 @@ bool is_flow_tap_key(uint16_t keycode) {
     switch (keycode) {
         case LSFT_T(FR_T):
         case RSFT_T(FR_N):
+        case W_RCIRC:
+        case F_ACUTE:
+        case P_RGRAV:
+        case G_TREMA:
+        case O_LGRAV:
+        case Y_LCIRC:
             return false;
     }
     switch (get_tap_keycode(keycode)) {
